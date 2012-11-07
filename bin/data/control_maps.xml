@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	<map>
+		<control type="move" id="left" keyCode="37"/>
+		<control type="move" id="right" keyCode="39"/>
+		<control type="move" id="jump" keyCode="32"/>
+		<control type="move" id="duck" keyCode="40"/>
+		
+		<control type="block" id="up" keyCode="16"/>
+		<control type="block" id="down" keyCode="40" modifier="16" />
+		
+		<control type="attack" id="high" keyCode="87"/>
+		<control type="attack" id="mid" keyCode="68"/>
+		<control type="attack" id="low" keyCode="83"/>
+		<control type="attack" id="special_1" keyCode="65"/>
+	</map>
+</data>
