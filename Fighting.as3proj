@@ -4,22 +4,22 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\Fighting.swf" />
+    <movie path="bin\fighting.swf" />
     <movie fps="30" />
-    <movie width="1024" />
-    <movie height="768" />
-    <movie version="10" />
-    <movie minorVersion="1" />
+    <movie width="800" />
+    <movie height="600" />
+    <movie version="11" />
+    <movie minorVersion="5" />
     <movie platform="Flash Player" />
     <movie background="#FFFFFF" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="H:\Private\flash\[EVO GIT]\flash-clients\flash\libs\SignalMediator\src" />
-    <class path="H:\Private\flash\[EVO GIT]\flash-clients\flash\libs\SignalsCommandMap\src" />
-    <class path="H:\Private\flash\[EVO GIT]\flash-clients\flash\libs\CollisionDetectionKit_v15" />
-    <class path="..\..\libraries\box2d\Source" />
+    <class path="..\GIT Evo\flash-clients\flash\libs\SignalsCommandMap\src" />
+    <class path="..\GIT Evo\flash-clients\flash\libs\SignalMediator\src" />
+    <class path="..\GIT Private\libraries\box2d\Source" />
+    <class path="..\GIT Evo\flash-clients\flash\EvolutionGamingCore\src" />
   </classpaths>
   <!-- Build options -->
   <build>
@@ -40,7 +40,7 @@
     <option useNetwork="True" />
     <option useResourceBundleMetadata="True" />
     <option warnings="True" />
-    <option verboseStackTraces="True" />
+    <option verboseStackTraces="False" />
     <option linkReport="" />
     <option loadExterns="" />
     <option staticLinkRSL="True" />
@@ -55,9 +55,9 @@
   <!-- SWC Libraries -->
   <libraryPaths>
     <element path="assets\fighting.swc" />
-    <element path="..\..\[EVO GIT]\flash-clients\flash\libs\as3-signals-v0.9-BETA.swc" />
-    <element path="..\..\[EVO GIT]\flash-clients\flash\libs\robotlegs-framework-v1.5.2.swc" />
-    <element path="..\..\[EVO GIT]\flash-clients\flash\libs\AssetLoader-v2.5.0.swc" />
+    <element path="..\GIT Evo\flash-clients\flash\libs\robotlegs-framework-v1.5.2.swc" />
+    <element path="..\GIT Evo\flash-clients\flash\libs\as3-signals-v0.9-BETA.swc" />
+    <element path="..\GIT Evo\flash-clients\flash\libs\AssetLoader-v2.5.1.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

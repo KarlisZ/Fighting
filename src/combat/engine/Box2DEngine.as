@@ -7,10 +7,15 @@ package combat.engine {
 	import Box2D.Dynamics.b2Body;
 	import Box2D.Dynamics.b2BodyDef;
 	import Box2D.Dynamics.b2DebugDraw;
+	import Box2D.Dynamics.b2Fixture;
 	import Box2D.Dynamics.b2FixtureDef;
 	import Box2D.Dynamics.b2World;
+	import Box2D.Dynamics.Contacts.b2Contact;
+	import Box2D.Dynamics.Contacts.b2ContactEdge;
 	import combat.data.AffectVO;
 	import combat.engine.api.IEngine;
+	import combat.engine.events.ContactEvent;
+	import combat.engine.listeners.FighterContactListener;
 	import combat.view.ICollidableObject;
 	import flash.display.Graphics;
 	import flash.display.MovieClip;
@@ -48,7 +53,8 @@ package combat.engine {
 			world = new b2World(gravityVector, true);
 			
 			_stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-			
+
+			//world.add
 		}
 		
 		private function onEnterFrame(e:Event):void
@@ -64,20 +70,25 @@ package combat.engine {
 			world.ClearForces();
 			
 			var body:b2Body, sprite:Sprite;
-			var userData:UserDataVO;
+			var userData:UserDataVO, centerPoint:Point;
+			var contactList:b2ContactEdge, contact:b2Contact;
 			for (body = world.GetBodyList(); body; body = body.GetNext())
 			{
 				userData = body.GetUserData();
 				if (!userData) { continue; } // FIXME
 				if (!userData.container) // move containers
 				{
+					// placement
 					sprite = userData.sprite;
 					sprite.x = body.GetPosition().x * _pixelsToMeters;
 					sprite.y = body.GetPosition().y * _pixelsToMeters;
 				}
-				else
+				else // move parts
 				{
-					//body.
+					// placement
+					centerPoint = userData.sprite.localToGlobal(new Point(userData.sprite.center.x, userData.sprite.center.y));
+					body.SetPosition(new b2Vec2(centerPoint.x / _pixelsToMeters, centerPoint.y / _pixelsToMeters));
+					body.SetAngle((userData.sprite.rotation - 180) * userData.sprite.parent.scaleX * (Math.PI / 180)); // in radians
 				}
 			}
 			
@@ -129,7 +140,7 @@ package combat.engine {
 			var ret:b2Body;
 			for each (var body:b2Body in dynamicBodies)
 			{
-				if (body.GetUserData() == object)
+				if (body.GetUserData().sprite == object)
 				{
 					ret = body;
 					break;
@@ -142,21 +153,21 @@ package combat.engine {
 		public function addObjects(objects:Vector.<ICollidableObject>):void
 		{
 			var bodyDef:b2BodyDef, shape:b2PolygonShape, body:b2Body, fixture:b2FixtureDef, containerBody:b2Body;
+			var centerPoint:Point = new Point();
 			for each (var container:ICollidableObject in objects)
 			{
+				
 				bodyDef = new b2BodyDef();
 				bodyDef.position.Set	(
-											//(container.x+(container.width * .5))/_pixelsToMeters,
-											//(container.y+(container.height * .5))/_pixelsToMeters
 											container.x/_pixelsToMeters,
 											container.y/_pixelsToMeters
 										);
 
 				bodyDef.type = b2Body.b2_dynamicBody;
-				bodyDef.allowSleep = true;
+				bodyDef.allowSleep = false;
 				
 				containerBody = world.CreateBody(bodyDef);
-				containerBody.SetUserData(new UserDataVO(container as Sprite));
+				containerBody.SetUserData(new UserDataVO(container as MovieClip));
 				containerBody.SetFixedRotation(true);
 				
 				shape = new b2PolygonShape();
@@ -169,21 +180,30 @@ package combat.engine {
 				fixture.shape = shape;
 				fixture.density = 1;
 				fixture.friction = .3;
+				//fixture.isSensor = true;
 				
 				containerBody.CreateFixture(fixture);
 				
 				dynamicBodies.push(containerBody);
+				var contactListener:FighterContactListener = new FighterContactListener();
+				contactListener.eventDispatcher.addEventListener(ContactEvent.FIGHTER_CONTACT, onFighterContact);
+				world.SetContactListener(contactListener);
 				
-				for each (var o:MovieClip in container.getSubObjects())
+				for each (var o:MovieClip in container.getSubObjects()) // sub objects
 				{
+					if (o.center) // TODO: do the math, not center objects
+						centerPoint = o.localToGlobal(new Point(o.center.x, o.center.y));
+					else
+						trace("[WARNING] Box2DEngine: " + o.name + " doesn't have a set center object");
+						
 					bodyDef = new b2BodyDef();
 					bodyDef.position.Set	(
-												(bodyDef.position.x + o.x)/_pixelsToMeters,
-												(bodyDef.position.y + o.y)/_pixelsToMeters
+												(centerPoint.x)/_pixelsToMeters,
+												(centerPoint.y)/_pixelsToMeters
 											);
 
-					bodyDef.type = b2Body.b2_kinematicBody;
-					bodyDef.allowSleep = true;
+					bodyDef.type = b2Body.b2_dynamicBody;
+					bodyDef.allowSleep = false;
 					
 					body = world.CreateBody(bodyDef);
 					body.SetUserData(new UserDataVO(o, containerBody));
@@ -194,7 +214,7 @@ package combat.engine {
 												(o.getChildAt(0).width * .5)/_pixelsToMeters,
 												(o.getChildAt(0).height * .5) / _pixelsToMeters
 											);
-					body.SetAngle(o.rotation * (Math.PI / 180)); // in radians
+					body.SetAngle((o.rotation - 180) * (Math.PI / 180)); // in radians
 					
 					fixture = new b2FixtureDef();
 					fixture.shape = shape;
@@ -206,6 +226,36 @@ package combat.engine {
 					
 					dynamicBodies.push(body);
 				}
+			}
+		}
+		
+		private function onFighterContact(e:ContactEvent):void 
+		{
+			var contact:b2Contact = e.contact;
+			var fixtureA:b2Fixture = contact.GetFixtureA();
+			var fixtureB:b2Fixture = contact.GetFixtureB();
+			var containerA:b2Body = fixtureA.GetBody().GetUserData().container;
+			var containerB:b2Body = fixtureB.GetBody().GetUserData().container;
+			var userDataA:UserDataVO = containerA.GetUserData();
+			var userDataB:UserDataVO = containerB.GetUserData();
+			
+			//trace("fighter contact", userDataA.sprite.name, userDataB.sprite.name);
+			
+			var partAPosition:b2Vec2 = fixtureA.GetBody().GetPosition();
+			var partBPosition:b2Vec2 = fixtureB.GetBody().GetPosition();
+			
+			
+			// check for carried force
+			if (userDataA.carriedForce || userDataB.carriedForce) // TODO: check if this is done twice every update
+			{
+				var facingMultiplierA:int = userDataA.sprite.getChildAt(0).scaleX;
+				var facingMultiplierB:int = userDataB.sprite.getChildAt(0).scaleX;
+				//var directionMultiplier:int = partAPosition.x < partBPosition.x ? 1 : -1; // simple relative direction determining
+				
+				if (userDataA.carriedForce)
+					containerB.ApplyForce(new b2Vec2(userDataA.carriedForce.x * facingMultiplierA, userDataA.carriedForce.y), containerB.GetPosition());
+				else
+					containerA.ApplyForce(new b2Vec2(userDataB.carriedForce.x * facingMultiplierB, userDataB.carriedForce.y), containerA.GetPosition());					
 			}
 		}
 		
@@ -244,7 +294,6 @@ package combat.engine {
 		public function affectWorld(affectVO:AffectVO):void
 		{
 			var body:b2Body = getBodyBySprite(affectVO.object);
-			
 			if (affectVO.force)
 				body.ApplyForce(new b2Vec2(affectVO.force.x, affectVO.force.y), body.GetPosition());
 				
@@ -256,6 +305,9 @@ package combat.engine {
 											body
 										)
 									);
+									
+			if (affectVO.carriedForce)
+				(body.GetUserData() as UserDataVO).carriedForce = affectVO.carriedForce;
 		}
 		
 		private function addPersistentEffect(newEffect:PersistentEffect):void
@@ -307,7 +359,9 @@ package combat.engine {
 }
 import Box2D.Common.Math.b2Vec2;
 import Box2D.Dynamics.b2Body;
+import flash.display.MovieClip;
 import flash.display.Sprite;
+import flash.geom.Point;
 
 class PersistentEffect {
 	public static const FORCE:String = "force";
@@ -326,11 +380,13 @@ class PersistentEffect {
 
 class UserDataVO
 {
-	public var sprite:Sprite;
+	public var carriedForce:Point;
+	public var sprite:MovieClip;
 	public var container:b2Body;
 	
-	public function UserDataVO(sprite:Sprite, container:b2Body = null)
+	public function UserDataVO(sprite:MovieClip, container:b2Body = null, carriedForce:Point = null)
 	{
+		this.carriedForce = carriedForce;
 		this.sprite = sprite;
 		this.container = container;
 		

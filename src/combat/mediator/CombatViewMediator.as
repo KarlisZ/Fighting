@@ -44,11 +44,12 @@ package combat.mediator {
 		}
 		
 		private function handleInput(event:KeyboardEvent, control:Control, fighter:IFighter):void
-		{
+		{return;
 			switch(event.type)
 			{
 				case KeyboardEvent.KEY_DOWN:
-					if (!isKeyDown(event.keyCode)) {
+					if (!isKeyDown(event.keyCode)) // some safety, events not always correct
+					{
 						downKeys.push(event.keyCode);
 						fighter.doAction(control.type, control.id);
 					}

@@ -11,6 +11,7 @@ package combat.view {
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import flash.utils.setTimeout;
 	/**
 	 * ...
@@ -25,7 +26,8 @@ package combat.view {
 		
 		private var _affectSignal:AffectSignal = new AffectSignal();
 		private var currentDirection:String = DirectionType.RIGHT;
-		private var delayedAffects:Vector.<uint>;
+		private var delayedAffects:Vector.<uint> = new <uint>[];
+		private var initBounds:Rectangle;
 		
 		public function Fighter(player:Player) {
 			_player = player;
@@ -43,6 +45,7 @@ package combat.view {
 			}
 			type = CollidingObjectType.DYNAMIC;
 			vector = new Point();
+			initBounds = getBounds(this);
 		}
 		
 		public function doAction(type:String, id:String):void
@@ -68,7 +71,7 @@ package combat.view {
 					
 				case AffectType.ATTACK_HIGH:
 					animationType = AnimationType.ATTACK_HIGH;
-					//delay = ;
+					delay = 300;
 					break;
 					
 				default:
@@ -132,13 +135,15 @@ package combat.view {
 				case DirectionType.RIGHT:
 				case DirectionType.LEFT:
 					animation.scaleX *= -1;
+					animation.x = animation.scaleX > 0 ? initBounds.x : initBounds.width * .5;
 					break;
 			}
 		}
 		
 		/* INTERFACE combat.view.ICollidableObject */
 		
-		override public function getSubObjects():Vector.<MovieClip> {
+		override public function getSubObjects():Vector.<MovieClip>
+		{
 			return subObjects;
 		}
 		

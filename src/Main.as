@@ -7,6 +7,7 @@ package {
 	 * ...
 	 * @author Karlis Zemdega
 	 */
+	[SWF(width='1200', height='800', fps='40')]
 	public class Main extends Sprite {
 		private var context:MainContext;
 		

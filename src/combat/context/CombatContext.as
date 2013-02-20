@@ -19,7 +19,6 @@ package combat.context {
 	import combat.view.api.IFighter;
 	import combat.view.CombatView;
 	import combat.view.Fighter;
-	import engine.context.EngineContext;
 	import flash.display.DisplayObjectContainer;
 	import org.osflash.signals.Signal;
 	import org.robotlegs.mvcs.SignalContext;
@@ -28,7 +27,6 @@ package combat.context {
 	 * @author Karlis Zemdega
 	 */
 	public class CombatContext extends SignalContext {
-		private var engineContext:EngineContext;
 		
 		public function CombatContext(contextView:DisplayObjectContainer=null){
 			super(contextView);

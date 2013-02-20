@@ -10,8 +10,9 @@ package combat.data
 	{
 		
 		public var object:ICollidableObject;
-		public var force:Point;
-		public var persistentForce:Point;
+		public var force:Point; // afflicts self
+		public var carriedForce:Point; // afflicts other on contact, force is translated to direction facing
+		public var persistentForce:Point; // afflicts self constantly
 		
 		public function AffectVO(object:ICollidableObject = null)
 		{
@@ -37,6 +38,9 @@ package combat.data
 				case AffectType.MOVE_LEFT:
 					persistentForce = new Point(-10, 0);
 					break;
+					
+				case AffectType.ATTACK_HIGH:
+					carriedForce = new Point(30, -50);
 					
 				default:
 					ret = false;
