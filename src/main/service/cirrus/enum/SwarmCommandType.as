@@ -7,7 +7,8 @@ package main.service.cirrus.enum
 	public class SwarmCommandType 
 	{
 		
-		public static const PUBLISH_TO:int = 1;
+		public static const BROADCAST:int = 1;
+		public static const PRIVATE:int = 2;
 	}
 
 }

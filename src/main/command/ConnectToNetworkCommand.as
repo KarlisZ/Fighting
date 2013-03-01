@@ -1,5 +1,6 @@
 package main.command 
 {
+	import flash.events.Event;
 	import main.model.MainModel;
 	import main.service.CirrusService;
 	import org.robotlegs.mvcs.Command;
@@ -7,14 +8,14 @@ package main.command
 	 * ...
 	 * @author Karlis Zemdega
 	 */
-	public class ConnectToPeersCommand extends Command
+	public class ConnectToNetworkCommand  extends Command
 	{
 		[Inject] public var cirrus:CirrusService;
 		[Inject] public var model:MainModel;
 		
 		override public function execute():void
 		{
-			cirrus.connect(model.cirrusToken);
+			cirrus.connectToNetwork(model.cirrusToken);
 		}
 		
 	}

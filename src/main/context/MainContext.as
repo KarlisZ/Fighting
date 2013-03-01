@@ -4,11 +4,11 @@ package main.context
 	import combat.context.CombatContext;
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
-	import main.command.ConnectToPeersCommand;
-	import main.command.PublishToStreamCommand;
-	import main.command.SendGreetingCommand;
-	import main.command.SetupServerCommand;
+	import main.command.ConnectToNetworkCommand;
+	import main.command.CreateNetworkCommand;
+	import main.command.SendDataCommand;
 	import main.command.StartupCommand;
+	import main.event.TestEvent;
 	import main.model.MainModel;
 	import main.service.CirrusService;
 	import main.service.events.CirrusServiceEvent;
@@ -35,11 +35,11 @@ package main.context
 			injector.mapSingleton(MainModel);
 			injector.mapSingleton(CirrusService);
 			
-			commandMap.mapEvent(CirrusServiceEvent.CONNECTED, SendGreetingCommand, CirrusServiceEvent, true);
+			//commandMap.mapEvent(CirrusServiceEvent.CONNECTED, SendGreetingCommand, CirrusServiceEvent, true);
 			commandMap.mapEvent("startupComplete", StartupCommand, Event, true);
-			commandMap.mapEvent("connectAsClient", ConnectToPeersCommand, Event, true);
-			commandMap.mapEvent("connectAsServer", SetupServerCommand, Event, true);
-			commandMap.mapEvent("publishData", PublishToStreamCommand, Event, true);
+			commandMap.mapEvent(TestEvent.CONNECT_TO_NETWORK, ConnectToNetworkCommand, TestEvent, true);
+			commandMap.mapEvent(TestEvent.CREATE_NETWORK, CreateNetworkCommand, TestEvent, true);
+			commandMap.mapEvent(TestEvent.SEND_DATA, SendDataCommand, TestEvent);
 			
 			//dispatchEvent(new Event("connectToPeers"));
 			super.startup();

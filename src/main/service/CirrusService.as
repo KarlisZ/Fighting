@@ -1,5 +1,7 @@
 package main.service 
 {
+	import com.evolutiongaming.games.core.utils.log.EvoLogger;
+	import com.evolutiongaming.games.core.utils.log.IEvoLogger;
 	import flash.events.NetStatusEvent;
 	import flash.net.GroupSpecifier;
 	import flash.net.NetConnection;
@@ -7,6 +9,7 @@ package main.service
 	import flash.system.System;
 	import flash.utils.setTimeout;
 	import main.model.MainModel;
+	import main.service.cirrus.PeerManager;
 	import main.service.events.CirrusServiceEvent;
 	import org.robotlegs.mvcs.Actor;
 	/**
@@ -22,135 +25,58 @@ package main.service
 		private const CIRRUS_DEV_KEY:String = "9bcd901b7ae990234c275219-b39f5f7ebb8c";
 		private const CIRRUS_URL:String = "rtmfp://p2p.rtmfp.net/";
 		
+		private var logger:IEvoLogger = EvoLogger.getLogger(CirrusService);
 		private var netConnection:NetConnection;
-		private var sendStream:NetStream;
-		private var receiveStream:NetStream;
-		private var seed:String;
-		private var inited:Boolean;
-		private var inbound:Boolean;
+		private var peerManager:PeerManager;
+		private var seedId:String;
 		
 		public function CirrusService() 
 		{
+			peerManager = new PeerManager();
 			netConnection = new NetConnection();
 		}
 		
-		private function onConnectionNetStatus(e:NetStatusEvent):void 
+		public function connectToNetwork(peerId:String):void 
 		{
-			print("connection status", e.info.code, inited);
-			switch(e.info.code)
-			{
-				case "NetConnection.Connect.Success":
-					if (!inited) 
-					{
-						inited = true;
-						initStreams();
-					}
-					break;				
-			}
+			seedId = peerId;
+			connectToCirrus();
 		}
 		
-		private function initStreams():void 
+		private function connectToCirrus():void 
 		{
-			// TODO: remove me
-			if (!seed)			
-				System.setClipboard(netConnection.nearID);			
-			else
-				createInboundStream(seed);
-				
-			createOutboundStream();
-		}
-		
-		private function createOutboundStream():void 
-		{
-			print("create outbound");
-			sendStream = new NetStream(netConnection, NetStream.DIRECT_CONNECTIONS);
-			sendStream.addEventListener(NetStatusEvent.NET_STATUS, onOutboundNetStatus);
-			var client:Object = { };
-			client.onPeerConnect = onPeerConnect;
-			client.onNetStatus = onOutboundNetStatus;
-			sendStream.client = client;
-			if(!seed) sendStream.publish('seedPublish');
-			
-			
-			print("near id", netConnection.nearID);
-			//receiveStream = new NetStream(
-		}
-		
-		private function onInboundNetStatus(e:NetStatusEvent):void 
-		{
-			print("inbound net stream event", e.info.code);
-		}
-		
-		private function onPeerConnect(stream:NetStream):void 
-		{
-			print("peer connect, far id:", stream.farID);
-			if (!seed)
-				setTimeout(send, 2000, "publishTo", "peerPublish");
-				
-			createInboundStream(stream.farID);
-			delete sendStream.client.onPeerConnect;
-		}
-		
-		private function onOutboundNetStatus(e:NetStatusEvent):void 
-		{
-			print("outbound net stream event", e.info.code);
-			switch(e.info.code)
-			{
-				case "NetStream.Publish.Start":
-					dispatch(new CirrusServiceEvent(CirrusServiceEvent.CONNECTED));
-					
-					break;
-					
-				
-			}
-		}
-		
-		private function createInboundStream(farId:String):void 
-		{
-			print("trying inbound, seed:", farId);
-			inbound = true;
-			receiveStream = new NetStream(netConnection, farId);
-			receiveStream.addEventListener(NetStatusEvent.NET_STATUS, onInboundNetStatus);
-			var client:Object = { };
-			client = { };
-			client.onNetStatus = onInboundNetStatus;
-			client.onReceiveData = onReceiveData;
-			receiveStream.client = client;
-			if (!seed)
-				receiveStream.play('peerPublish');
-			else
-				receiveStream.play('seedPublish');
-		}
-		
-		public function connect(token:String = null):void
-		{
-			this.seed = token;
-				
 			netConnection.addEventListener(NetStatusEvent.NET_STATUS, onConnectionNetStatus);
 			netConnection.connect(CIRRUS_URL, CIRRUS_DEV_KEY);
 		}
 		
-		public function send(...params):void
+		private function onConnectionNetStatus(e:NetStatusEvent):void 
 		{
-			print("sending", params);
-			params.unshift("onReceiveData");
-			sendStream.send.apply(null, params);
-		}
-		
-		private function onReceiveData(...params):void
-		{
-			print("holy fuck", params);
-			switch(params[0])
+			peerManager.debugTf = model.debugTf;
+			
+			
+			logger.debug('onConnectionNetStatus', e.info.code);
+			switch(e.info.code)
 			{
-				case "publishTo":
-					sendStream.publish(params[1]);
+				case "NetConnection.Connect.Success":
+					if (!seedId) System.setClipboard(netConnection.nearID);
+					peerManager.connectToNetwork(netConnection, seedId);
 					break;
 			}
 		}
 		
+		public function createNetwork():void
+		{
+			connectToCirrus();
+		}
+		
+		public function send(data:*):void 
+		{
+			print("sending", data);
+			peerManager.broadcast([data]);
+		}
+		
 		private function print(...rest):void
 		{
-			trace.apply(null, rest);
+			logger.debug.apply(null, rest);
 			model.debugTf.text += "\n" + rest;
 		}
 	}

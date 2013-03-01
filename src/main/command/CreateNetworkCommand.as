@@ -6,13 +6,13 @@ package main.command
 	 * ...
 	 * @author Karlis Zemdega
 	 */
-	public class SendGreetingCommand extends Command
+	public class CreateNetworkCommand extends Command
 	{
 		[Inject] public var cirrus:CirrusService;
 		
 		override public function execute():void
 		{
-			cirrus.send("hahaha data");
+			cirrus.createNetwork();
 		}
 		
 	}

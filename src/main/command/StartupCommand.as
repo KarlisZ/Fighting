@@ -1,9 +1,11 @@
 package main.command {
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
+	import flash.system.System;
 	import flash.text.TextField;
 	import flash.text.TextFieldType;
 	import flash.ui.Keyboard;
+	import main.event.TestEvent;
 	import main.model.MainModel;
 	import org.robotlegs.mvcs.Command;
 	import org.robotlegs.mvcs.SignalCommand;
@@ -48,17 +50,17 @@ package main.command {
 					if (!inited)
 					{
 						model.cirrusToken = model.inputTf.text;
-						dispatch(new Event("connectAsClient"));
+						dispatch(new TestEvent(TestEvent.CONNECT_TO_NETWORK));
 						inited = true;
 					}
 					else
 					{
-						dispatch(new Event("publishData"));
+						dispatch(new TestEvent(TestEvent.SEND_DATA, model.inputTf.text));
 					}
 					break;
 					
 				case Keyboard.ESCAPE:
-					dispatch(new Event("connectAsServer"));
+					dispatch(new TestEvent(TestEvent.CREATE_NETWORK));
 					inited = true;
 					break;
 					
