@@ -7,11 +7,10 @@ package main.model {
 	 */
 	public class MainModel extends Actor {
 		
-		public var debugTf:TextField;
-		public var inputTf:TextField;
 		public var cirrusToken:String;
 		
-		public function MainModel() {
+		public function MainModel()
+		{
 			
 		}
 		

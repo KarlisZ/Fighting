@@ -1,5 +1,6 @@
 package main.command 
 {
+	import common.event.SubcontextEvent;
 	import flash.events.Event;
 	import main.model.MainModel;
 	import main.service.CirrusService;
@@ -8,14 +9,15 @@ package main.command
 	 * ...
 	 * @author Karlis Zemdega
 	 */
-	public class ConnectToNetworkCommand  extends Command
+	public class ConnectToPeerCommand  extends Command
 	{
 		[Inject] public var cirrus:CirrusService;
 		[Inject] public var model:MainModel;
+		[Inject] public var event:SubcontextEvent;
 		
 		override public function execute():void
 		{
-			cirrus.connectToNetwork(model.cirrusToken);
+			cirrus.connectToNetwork(event.data.nearId);
 		}
 		
 	}

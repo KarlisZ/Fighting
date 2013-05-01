@@ -1,0 +1,120 @@
+package gui.view 
+{
+	import com.bit101.components.Text;
+	import com.bit101.components.TextArea;
+	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.text.TextField;
+	import flash.ui.Keyboard;
+	/**
+	 * ...
+	 * @author Karlis Zemdega
+	 */
+	public class Console extends Sprite
+	{
+		static public const DEFAULT_OUTPUT_HEIGHT:Number = 200;
+		static public const DEFAULT_INPUT_HEIGHT:Number = 30;
+		
+		private var outputTxt:TextArea;
+		private var inputTxt:Text;
+		
+		public function Console() 
+		{
+			init();
+			build();
+			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+			
+		}
+		
+		private function init():void 
+		{
+			visible = false;
+		}
+		
+		private function onAddedToStage(e:Event):void 
+		{
+			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+			
+			stage.addEventListener(KeyboardEvent.KEY_UP, onStageKeyUp);
+			
+		}
+		
+		private function build():void 
+		{
+			outputTxt = new TextArea();
+			outputTxt.width = stage.stageWidth;
+			outputTxt.height = DEFAULT_OUTPUT_HEIGHT;
+			
+			inputTxt = new Text();
+			inputTxt.width = stage.stageWidth;
+			inputTxt.height = DEFAULT_INPUT_HEIGHT;
+			inputTxt.y = outputTxt.height;
+			
+			inputTxt.editable = true;
+			
+			addChild(outputTxt);
+			addChild(inputTxt);
+			
+			inputTxt.addEventListener(KeyboardEvent.KEY_UP, onInputKeyUp);
+		}
+		
+		private function onInputKeyUp(e:KeyboardEvent):void 
+		{
+			switch(e.keyCode)
+			{
+				case Keyboard.ENTER:
+					parseInput(inputTxt.text);
+					break;
+			}
+		}
+		
+		private function parseInput(text:String):void 
+		{
+			
+		}
+		
+		private function onStageKeyUp(e:KeyboardEvent):void 
+		{
+			switch(e.keyCode)
+			{
+				case Keyboard.BACKQUOTE: // tilde
+					if (visible)
+						hide();
+					else
+						show();
+					break;
+					
+				/*case Keyboard.ENTER:
+					if (!inited)
+					{
+						model.cirrusToken = model.inputTf.text;
+						dispatch(new TestEvent(TestEvent.CONNECT_TO_NETWORK));
+						inited = true;
+					}
+					else
+					{
+						dispatch(new TestEvent(TestEvent.SEND_DATA, model.inputTf.text));
+					}
+					break;
+					
+				case Keyboard.ESCAPE:
+					dispatch(new TestEvent(TestEvent.CREATE_NETWORK));
+					inited = true;
+					break;*/
+			}
+		}
+		
+		private function show():void 
+		{
+			visible = true;
+		}
+		
+		private function hide():void 
+		{
+			visible = false
+		}
+		
+	}
+
+}

@@ -28,11 +28,13 @@ package combat.context {
 	 */
 	public class CombatContext extends SignalContext {
 		
-		public function CombatContext(contextView:DisplayObjectContainer=null){
+		public function CombatContext(contextView:DisplayObjectContainer)
+		{
 			super(contextView);
 		}
 		
-		override public function startup():void {
+		override public function startup():void 
+		{
 			//var startupSignal:Signal = new Signal();
 			//signalCommandMap.mapSignal(startupSignal, StartupCommand, true);
 			

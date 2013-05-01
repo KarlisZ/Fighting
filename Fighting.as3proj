@@ -58,6 +58,8 @@
     <element path="..\GIT Evo\flash-clients\flash\libs\robotlegs-framework-v1.5.2.swc" />
     <element path="..\GIT Evo\flash-clients\flash\libs\as3-signals-v0.9-BETA.swc" />
     <element path="..\GIT Evo\flash-clients\flash\libs\AssetLoader-v2.5.1.swc" />
+    <element path="..\GIT Private\libraries\as3\swc\MinimalComps_0_9_10.swc" />
+    <element path="..\GIT Private\libraries\as3\swc\Console2.6+asdoc.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

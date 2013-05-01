@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'21/02/2013'</value>
+      <value>'01/05/2013'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -44,6 +44,8 @@
       <path-element>H:\Private\flash\GIT Evo\flash-clients\flash\libs\robotlegs-framework-v1.5.2.swc</path-element>
       <path-element>H:\Private\flash\GIT Evo\flash-clients\flash\libs\as3-signals-v0.9-BETA.swc</path-element>
       <path-element>H:\Private\flash\GIT Evo\flash-clients\flash\libs\AssetLoader-v2.5.1.swc</path-element>
+      <path-element>H:\Private\flash\GIT Private\libraries\as3\swc\MinimalComps_0_9_10.swc</path-element>
+      <path-element>H:\Private\flash\GIT Private\libraries\as3\swc\Console2.6+asdoc.swc</path-element>
     </library-path>
   </compiler>
   <file-specs>

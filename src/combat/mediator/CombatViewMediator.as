@@ -6,6 +6,7 @@ package combat.mediator {
 	import combat.view.api.IFighter;
 	import combat.view.Fighter;
 	import flash.events.KeyboardEvent;
+	import flash.ui.Keyboard;
 	import org.osflash.signals.natives.NativeSignal;
 	import org.robotlegs.mvcs.SignalMediator;
 	/**
@@ -44,7 +45,7 @@ package combat.mediator {
 		}
 		
 		private function handleInput(event:KeyboardEvent, control:Control, fighter:IFighter):void
-		{return;
+		{
 			switch(event.type)
 			{
 				case KeyboardEvent.KEY_DOWN:

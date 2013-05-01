@@ -1,20 +1,20 @@
 package main.command 
 {
-	import main.event.TestEvent;
+	import common.event.SubcontextEvent;
 	import main.service.CirrusService;
 	import org.robotlegs.mvcs.Command;
 	/**
 	 * ...
 	 * @author Karlis Zemdega
 	 */
-	public class SendDataCommand extends Command
+	public class PingPeerCommand extends Command
 	{
 		[Inject] public var cirrus:CirrusService;
-		[Inject] public var event:TestEvent;
+		[Inject] public var event:SubcontextEvent;
 		
 		override public function execute():void
 		{
-			cirrus.send(event.data);
+			cirrus.pingPeer(event.data.nearId);
 		}
 		
 	}

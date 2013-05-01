@@ -2,6 +2,7 @@ package main.service
 {
 	import com.evolutiongaming.games.core.utils.log.EvoLogger;
 	import com.evolutiongaming.games.core.utils.log.IEvoLogger;
+	import com.junkbyte.console.Cc;
 	import flash.events.NetStatusEvent;
 	import flash.net.GroupSpecifier;
 	import flash.net.NetConnection;
@@ -50,15 +51,19 @@ package main.service
 		
 		private function onConnectionNetStatus(e:NetStatusEvent):void 
 		{
-			peerManager.debugTf = model.debugTf;
+			//peerManager.debugTf = model.debugTf;
 			
 			
 			logger.debug('onConnectionNetStatus', e.info.code);
 			switch(e.info.code)
 			{
 				case "NetConnection.Connect.Success":
-					if (!seedId) System.setClipboard(netConnection.nearID);
-					peerManager.connectToNetwork(netConnection, seedId);
+					Cc.log('Connection successful! Your peer ID is: ' + netConnection.nearID);
+					peerManager.connection = netConnection;
+					peerManager.publishToPublic();
+					
+					if (seedId)
+						peerManager.connectToSeed(seedId);
 					break;
 			}
 		}
@@ -68,16 +73,26 @@ package main.service
 			connectToCirrus();
 		}
 		
-		public function send(data:*):void 
+		public function broadcast(data:*):void 
 		{
 			print("sending", data);
 			peerManager.broadcast([data]);
 		}
 		
+		public function pingPeer(nearId:String):void 
+		{
+			peerManager.pingPeer(nearId);
+		}
+		
+		public function createPrivateConnection(nearId:String):void 
+		{
+			peerManager.createPrivateConnection(nearId);
+		}
+		
 		private function print(...rest):void
 		{
 			logger.debug.apply(null, rest);
-			model.debugTf.text += "\n" + rest;
+			//model.debugTf.text += "\n" + rest;
 		}
 	}
 

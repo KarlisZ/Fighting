@@ -1,4 +1,4 @@
-package main.event 
+package gui.event 
 {
 	import flash.events.Event;
 	/**
