@@ -11,7 +11,8 @@ package gui.data
 		public static const CREATE_NETWORK:String = 'createNetwork';
 		static public const BROADCAST:String = "broadcast";
 		static public const PING_PEER:String = "pingPeer";
-		static public const REQUEST_PRIVATE_STREAM:String = "private";
+		static public const REQUEST_PRIVATE_STREAM:String = "createPrivate";
+		static public const SEND_TO_PRIVATE:String = "sendToPrivate";
 		
 	}
 

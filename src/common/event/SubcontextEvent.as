@@ -13,6 +13,7 @@ package common.event
 		static public const BROADCAST:String = "SubcontextEvent.BROADCAST";
 		static public const PING_PEER:String = "SubcontextEvent.PING_PEER";
 		static public const REQUEST_PRIVATE_STREAM:String = "SubcontextEvent.REQUEST_PRIVATE_STREAM";
+		static public const SEND_TO_PRIVATE:String = "SubcontextEvent.SEND_TO_PRIVATE";
 		
 		public var data:SubcontextDataVo;
 		

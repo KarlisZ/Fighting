@@ -89,6 +89,11 @@ package main.service
 			peerManager.createPrivateConnection(nearId);
 		}
 		
+		public function sendToPrivateSwarm(nearId:String, message:String):void 
+		{
+			peerManager.sendToPeer(nearId, [message]);
+		}
+		
 		private function print(...rest):void
 		{
 			logger.debug.apply(null, rest);

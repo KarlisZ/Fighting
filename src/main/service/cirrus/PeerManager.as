@@ -17,6 +17,7 @@ package main.service.cirrus
 	public class PeerManager 
 	{
 		static private const ON_RECEIVE_DATA:String = 'onReceiveData';		
+		static private const PUBLISH_STREAM_TYPE:String = 'publishStreamType';		
 		
 		private var logger:IEvoLogger = EvoLogger.getLogger(PeerManager);
 		private var publicInStreams:Vector.<StreamVo> = new <StreamVo>[];
@@ -47,16 +48,21 @@ package main.service.cirrus
 		{
 			Cc.log('Creating private connection to ' + peerId);
 			logger.debug('Creating private connection to ' + peerId);
-			var privateHash:String = Math.random().toString(); // TODO: create actual unique hash
-			createOutStream(StreamType.PUBLISH_PRIVATE, privateHash);
-			sendToSwarm(SwarmCommandType.CREATE_PRIVATE_CONNECTION, [peerId, privateHash]);
+			createOutStream(StreamType.PUBLISH_PRIVATE, peerId);
+			sendToSwarm(SwarmCommandType.CREATE_PRIVATE_CONNECTION, [peerId]);
 		}
 		
-		private function createOutStream(type:String, uniqueId:String = null):String 
+		/**
+		 * Creates a publish stream
+		 * @param	type	A StreamType string.
+		 * @param	peerId	For private connections, the remote peer ID.
+		 * @return	Returns the publishing stream name.
+		 * @example	
+		 * @example	
+		 */
+		private function createOutStream(type:String, remoteId:String = null):String 
 		{
-			var streamName:String = 'publishStreamType' + type + '::' + connection.nearID;
-			if (uniqueId)
-				streamName = streamName.concat('::', uniqueId);
+			var streamName:String = PUBLISH_STREAM_TYPE + type + '::' + connection.nearID;
 			
 			var newStream:NetStream = new NetStream(connection, NetStream.DIRECT_CONNECTIONS);
 			newStream.addEventListener(NetStatusEvent.NET_STATUS, onOutboundNetStatus);
@@ -74,8 +80,9 @@ package main.service.cirrus
 					break;
 					
 				case StreamType.PUBLISH_PRIVATE:
+					streamName = streamName.concat('::', remoteId);
 					client.onPeerConnect = onPrivatePeerConnect;
-					privateOutStreams.push(new StreamVo(type, newStream, connection.nearID, uniqueId));
+					privateOutStreams.push(new StreamVo(type, newStream, remoteId));
 					break;
 					
 				default:
@@ -90,8 +97,16 @@ package main.service.cirrus
 			return streamName;
 		}
 		
-		private function createInStream(type:String, peerId:String, uniqueId:String = null):void 
+		/**
+		 * Creates a play stream.
+		 * @param	type	A StreamType string.
+		 * @param	peerId	The publishing peer ID.
+		 * @example
+		 * @example
+		 */
+		private function createInStream(type:String, peerId:String):void 
 		{
+			var streamName:String;
 			
 			var newStream:NetStream = new NetStream(connection, peerId);
 			newStream.addEventListener(NetStatusEvent.NET_STATUS, onInboundNetStatus);
@@ -100,31 +115,26 @@ package main.service.cirrus
 			client.onNetStatus = onInboundNetStatus;
 			newStream.client = client;
 			
-			var streamVo:StreamVo = new StreamVo(type, newStream, peerId, uniqueId);
+			var streamVo:StreamVo = new StreamVo(type, newStream, peerId);
 			
 			switch (type)
 			{
-				// the function param type defines what type to listen to, but seed publishes to publish id so we listen to that
 				case StreamType.LISTEN_PUBLIC:
 					publicInStreams.push(streamVo);
-					type = StreamType.PUBLISH_PUBLIC; 
+					streamName = PUBLISH_STREAM_TYPE + StreamType.PUBLISH_PUBLIC + '::' + peerId;
 					break;
 					
 				case StreamType.LISTEN_PRIVATE:
 					privateInStreams.push(streamVo);
-					type = StreamType.PUBLISH_PRIVATE;
+					streamName = PUBLISH_STREAM_TYPE + StreamType.PUBLISH_PRIVATE + '::' + peerId + '::' + connection.nearID;
 					break;
 					
 					
 				default:
 					throw new Error('Unexpected stream type: ' + type);
 					
-			}				
+			}		
 			
-			var streamName:String = 'publishStreamType' + type + '::' + peerId;
-			
-			if (uniqueId)
-				streamName = streamName.concat('::', uniqueId);
 			
 			newStream.play(streamName);
 			
@@ -151,14 +161,14 @@ package main.service.cirrus
 			
 		}
 		
-		public function broadcast(data:Array, exceptId:String = null):void
+		public function broadcast(data:Array):void
 		{
-			sendToSwarm(SwarmCommandType.BROADCAST, data);
+			sendToSwarm(SwarmCommandType.PARSE_BROADCAST, data);
 		}
 		
 		public function pingPeer(id:String):void 
 		{
-			sendToSwarm(SwarmCommandType.PING, [getTimer()]);
+			sendToSwarm(SwarmCommandType.REPLY_TO_PING, [getTimer()]);
 		}
 		
 		public function publishToPublic():void 
@@ -168,7 +178,7 @@ package main.service.cirrus
 		
 		private function replyPing(time:String):void 
 		{
-			sendToSwarm(SwarmCommandType.REPLY_TO_PING, [time]);
+			sendToSwarm(SwarmCommandType.PARSE_PING_REPLY, [time]);
 		}
 		
 		/**
@@ -185,9 +195,13 @@ package main.service.cirrus
 			publicOutStream.send.apply(null, data);
 		}		
 		
-		private function sendToPeer(peerId:String):void
+		public function sendToPeer(peerId:String, data:Array):void
 		{
-			getOutStream(peerId).send(ON_RECEIVE_DATA, SwarmCommandType.CREATE_PRIVATE_CONNECTION, connection.nearID, peerId);
+			data.unshift(connection.nearID);
+			data.unshift(SwarmCommandType.PARSE_PRIVATE_DATA);
+			data.unshift(ON_RECEIVE_DATA);			
+			logger.debug('Sending data to private peer: ', String(data));
+			getOutStream(peerId).send.apply(null, data);
 		}
 		
 		/**
@@ -210,15 +224,12 @@ package main.service.cirrus
 		 * @param	id
 		 * @return
 		 */
-		private function getInStream(id:String):NetStream
+		private function getInStream(type:String, id:String):NetStream
 		{
 			var allInStreams:Vector.<StreamVo> = publicInStreams.concat(privateInStreams);
-			for each (var o:StreamVo in publicInStreams) 
+			for each (var o:StreamVo in allInStreams)
 			{
-				if (
-						(o.type === StreamType.LISTEN_PUBLIC || o.type === StreamType.LISTEN_PRIVATE)
-						&& o.peerId === id
-					)
+				if (o.type === type	&& o.peerId === id)
 					return o.stream
 			}
 			return null;
@@ -226,10 +237,21 @@ package main.service.cirrus
 		
 		private function onPrivatePeerConnect(stream:NetStream):void 
 		{
+			// we will have a publish stream to the other peer before he connects to our publish
+			// so if we don't have a publish stream to the farId, it's a third peer via a custom client.
+			if (!getOutStream(stream.farID))
+			{
+				Cc.log('A third peer ' + stream.farID + ' is listening to a private publish stream!');
+				logger.debug('A third peer ' + stream.farID + ' is listening to a private publish stream!');
+				// TODO: drop this connection and somehow create a new unique private connection with
+				// a different name without publishing to this stream so the third party can't listen in.
+				return;
+			}
+			
 			Cc.log("Private peer connected: " + stream.farID);
 			logger.debug("onPrivatePeerConnect(), far id:", stream.farID);
 			if(!getInStream(StreamType.LISTEN_PRIVATE, stream.farID)) // if you aren't the requester of the connection
-				createInStream(StreamType.LISTEN_PRIVATE, stream.farID, )
+				createInStream(StreamType.LISTEN_PRIVATE, stream.farID);
 		}		
 		
 		
@@ -238,7 +260,7 @@ package main.service.cirrus
 			Cc.log("Public peer connected: " + stream.farID);
 			logger.debug("onPublicPeerConnect(), far id:", stream.farID);
 			
-			if(!getInStream(stream.farID) && !getOutStream(stream.farID))
+			if(!getInStream(StreamType.LISTEN_PUBLIC, stream.farID) && !getOutStream(stream.farID))
 				addPeerToSwarm(stream.farID);
 		}		
 		
@@ -264,43 +286,51 @@ package main.service.cirrus
 			
 			switch(command)
 			{
-				case SwarmCommandType.BROADCAST:
+				case SwarmCommandType.PARSE_BROADCAST:
 					
 					Cc.log('Received broadcast data: ' + params.toString());
 					//broadcast(params, peerId);
 					break;
 					
 				case SwarmCommandType.CREATE_PRIVATE_CONNECTION:
-					var privatePublishId:String = params.shift();
-					var uniqueId:String = params.shift();
-					if (connection.nearID === privatePublishId)
+					var privateReqId:String = params.shift(); // the ID of the peer that the sender wants to connect to.
+					if (connection.nearID === privateReqId)
 					{
 						Cc.log('Request for private connection received, setting up listening stream...');
-						createOutStream(StreamType.PUBLISH_PRIVATE, uniqueId);
-						createInStream(StreamType.LISTEN_PRIVATE, peerId, uniqueId);
+						createOutStream(StreamType.PUBLISH_PRIVATE, peerId);
+						createInStream(StreamType.LISTEN_PRIVATE, peerId);
 					}
 					else
 						Cc.log('Request for private connection received, but not for me.');
 					break;
 					
-				case SwarmCommandType.PING:
+				case SwarmCommandType.REPLY_TO_PING:
 					Cc.log('Ping received from peer '+peerId+', replying...');
 					replyPing(params[0]);
 					break;
 					
-				case SwarmCommandType.REPLY_TO_PING:
+				case SwarmCommandType.PARSE_PING_REPLY:
 					Cc.log('Your latency to peer ' + peerId + ' is ' + (getTimer() - Number(params[0])) + 'ms.');
 					break;
 					
 				case SwarmCommandType.ADD_PEER:
 					var otherPeerId:String = params.shift();
 					// don't add as a new peer if alrady connected to that peer and if new peer is you
-					if (!getInStream(otherPeerId) && otherPeerId != connection.nearID)
+					if (!getInStream(StreamType.LISTEN_PUBLIC, otherPeerId) && otherPeerId != connection.nearID)
 					{
 						Cc.log('New peer in swarm: ' + otherPeerId);
 						createInStream(StreamType.LISTEN_PUBLIC, otherPeerId); 
 					}
 					break;
+					
+				case SwarmCommandType.PARSE_PRIVATE_DATA:
+					// don't check if inteded for me because private swarms only have two peers
+					Cc.log('Private data received: ' + params);
+					logger.debug('Private data received: ' + params);					
+					break;
+				
+				default:
+					throw new Error('Unexpected command type received: ' + command);
 			}
 		}
 		
@@ -323,14 +353,12 @@ class Peer
 
 class StreamVo
 {
-	public var uniqueId:String;
 	public var type:String;
 	public var stream:NetStream;
 	public var peerId:String;
-	// TODO: save far id for private connections so when returning on onPeerConnect original peer can listen on remote peers publish
-	public function StreamVo(type:String, stream:NetStream, peerId:String, uniqueId:String = null) 
+	
+	public function StreamVo(type:String, stream:NetStream, peerId:String) 
 	{
-		this.uniqueId = uniqueId;
 		this.type = type;
 		this.stream = stream;
 		this.peerId = peerId;

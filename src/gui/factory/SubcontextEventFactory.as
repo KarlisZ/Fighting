@@ -43,6 +43,13 @@ package gui.factory
 					ret = new SubcontextEvent(SubcontextEvent.REQUEST_PRIVATE_STREAM, dataVo);
 					break;
 				
+				case SubcontextEvent.SEND_TO_PRIVATE:
+					dataVo = new SubcontextDataVo();
+					dataVo.nearId = data['nearId'];
+					dataVo.message = data['message'];
+					ret = new SubcontextEvent(SubcontextEvent.SEND_TO_PRIVATE, dataVo);
+					break;
+				
 				default:
 					throw new Error('Unexpected event type "' + type + '" received.');
 			}

@@ -20,6 +20,7 @@ package gui.command
 			commandMap.mapEvent(ConsoleEvent.BROADCAST, DispatchSubcontextEventCommand, ConsoleEvent);
 			commandMap.mapEvent(ConsoleEvent.PING_PEER, DispatchSubcontextEventCommand, ConsoleEvent);
 			commandMap.mapEvent(ConsoleEvent.REQUEST_PRIVATE_STREAM, DispatchSubcontextEventCommand, ConsoleEvent);
+			commandMap.mapEvent(ConsoleEvent.SEND_TO_PRIVATE, DispatchSubcontextEventCommand, ConsoleEvent);
 		}
 		
 	}

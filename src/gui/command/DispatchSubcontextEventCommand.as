@@ -44,6 +44,10 @@ package gui.command
 				case ConsoleEvent.REQUEST_PRIVATE_STREAM:
 					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.REQUEST_PRIVATE_STREAM, consoleEvent.data));
 					break;
+					
+				case ConsoleEvent.SEND_TO_PRIVATE:
+					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.SEND_TO_PRIVATE, consoleEvent.data));
+					break;
 			}
 		}
 		

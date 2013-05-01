@@ -29,6 +29,16 @@ package gui.mediator
 			Cc.addSlashCommand(ConsoleCommandType.BROADCAST, onBroadcast, 'Broadcast a message to the swarm.');
 			Cc.addSlashCommand(ConsoleCommandType.PING_PEER, onPing, 'Ping a member of the swarm. Takes peer ID as param.');
 			Cc.addSlashCommand(ConsoleCommandType.REQUEST_PRIVATE_STREAM, onRequestPrivate, 'Create a private connection to a peer.');
+			Cc.addSlashCommand(ConsoleCommandType.SEND_TO_PRIVATE, onSendToPrivate, 'Send data to a private swarm.');
+		}
+		
+		private function onSendToPrivate(params:String):void 
+		{
+			var split:Array = params.split(" ");
+			var data:ConsoleDataVo = new ConsoleDataVo();
+			data.nearId = split[0];
+			data.message = split[1];
+			dispatch(new ConsoleEvent(ConsoleEvent.SEND_TO_PRIVATE, data));
 		}
 		
 		private function onRequestPrivate(nearId:String):void 
