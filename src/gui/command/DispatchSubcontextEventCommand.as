@@ -2,6 +2,7 @@ package gui.command
 {
 	import common.event.SubcontextEvent;
 	import gui.event.ConsoleEvent;
+	import gui.event.MenuEvent;
 	import gui.factory.SubcontextEventFactory;
 	import org.robotlegs.mvcs.Command;
 	/**
@@ -11,12 +12,24 @@ package gui.command
 	public class DispatchSubcontextEventCommand extends Command
 	{
 		[Inject] public var consoleEvent:ConsoleEvent;
+		[Inject] public var menuEvent:ConsoleEvent;
 		
 		override public function execute():void
 		{
 			if (consoleEvent)
-			{
 				parseConsoleEvent();
+				
+			if	(menuEvent)
+				parseMenuEvent();
+		}
+		
+		private function parseMenuEvent():void 
+		{
+			switch (menuEvent.type)
+			{
+				case MenuEvent.CREATE_TEST_COMBAT_STAGE:
+					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.CREATE_TEST_COMBAT_STAGE));					
+					break;
 			}
 		}
 		

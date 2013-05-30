@@ -38,8 +38,8 @@ package main.context
 		
 		override public function startup():void
 		{
-			combatContext = new CombatContext(contextView);
 			guiContext = new GuiContext(contextView);
+			combatContext = new CombatContext(contextView);
 			
 			listenToSubcontexts();
 			
@@ -47,7 +47,7 @@ package main.context
 			injector.mapSingleton(CirrusService);
 			
 			//commandMap.mapEvent(CirrusServiceEvent.CONNECTED, SendGreetingCommand, CirrusServiceEvent, true);
-			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, StartupCommand, Event, true);
+			//commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, StartupCommand, Event, true);
 			commandMap.mapEvent(SubcontextEvent.CONNECT_TO_PEER, ConnectToPeerCommand, SubcontextEvent);
 			commandMap.mapEvent(SubcontextEvent.CREATE_NETWORK, CreateNetworkCommand, SubcontextEvent);
 			commandMap.mapEvent(SubcontextEvent.BROADCAST, BroadcastCommand, SubcontextEvent);
@@ -66,6 +66,9 @@ package main.context
 			guiContext.addEventListener(SubcontextEvent.PING_PEER, onSubcontextEvent);
 			guiContext.addEventListener(SubcontextEvent.REQUEST_PRIVATE_STREAM, onSubcontextEvent);
 			guiContext.addEventListener(SubcontextEvent.SEND_TO_PRIVATE, onSubcontextEvent);
+			
+			// TODO: tell combat context to create view
+			guiContext.addEventListener(SubcontextEvent.CREATE_TEST_COMBAT_STAGE, onSubcontextCommEvent);
 		}
 		
 		private function onSubcontextEvent(e:SubcontextEvent):void 

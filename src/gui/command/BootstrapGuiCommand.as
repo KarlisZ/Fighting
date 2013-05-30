@@ -1,6 +1,7 @@
 package gui.command 
 {
 	import gui.event.ConsoleEvent;
+	import gui.event.MenuEvent;
 	import gui.model.GuiModel;
 	import org.robotlegs.mvcs.Command;
 	/**
@@ -21,6 +22,8 @@ package gui.command
 			commandMap.mapEvent(ConsoleEvent.PING_PEER, DispatchSubcontextEventCommand, ConsoleEvent);
 			commandMap.mapEvent(ConsoleEvent.REQUEST_PRIVATE_STREAM, DispatchSubcontextEventCommand, ConsoleEvent);
 			commandMap.mapEvent(ConsoleEvent.SEND_TO_PRIVATE, DispatchSubcontextEventCommand, ConsoleEvent);
+			
+			commandMap.mapEvent(MenuEvent.CREATE_TEST_COMBAT_STAGE, DispatchSubcontextEventCommand, MenuEvent);
 		}
 		
 	}

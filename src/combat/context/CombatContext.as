@@ -57,8 +57,8 @@ package combat.context {
 			
 			mediatorMap.createMediator(new Box2DEngine());
 			
-			initSignal.dispatch();
-			super.startup();
+			//initSignal.dispatch();
+			//super.startup();
 		}
 		
 	}

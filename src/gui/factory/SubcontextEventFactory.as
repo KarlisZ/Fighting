@@ -50,6 +50,10 @@ package gui.factory
 					ret = new SubcontextEvent(SubcontextEvent.SEND_TO_PRIVATE, dataVo);
 					break;
 				
+				case SubcontextEvent.CREATE_TEST_COMBAT_STAGE:
+					ret = new SubcontextEvent(SubcontextEvent.CREATE_TEST_COMBAT_STAGE);
+					break;
+				
 				default:
 					throw new Error('Unexpected event type "' + type + '" received.');
 			}

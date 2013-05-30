@@ -1,6 +1,7 @@
 package gui.command 
 {
 	import gui.model.GuiModel;
+	import gui.view.MainMenu;
 	import org.robotlegs.mvcs.Command;
 	/**
 	 * ...
@@ -12,6 +13,10 @@ package gui.command
 		
 		override public function execute():void
 		{
+			var mainMenu:MainMenu = new MainMenu();
+			model.mainMenu = mainMenu;
+			
+			contextView.addChild(mainMenu);
 		}
 		
 	}
