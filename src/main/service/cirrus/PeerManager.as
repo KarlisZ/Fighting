@@ -1,8 +1,8 @@
 package main.service.cirrus 
 {
-	import com.evolutiongaming.games.core.utils.log.EvoLogger;
-	import com.evolutiongaming.games.core.utils.log.IEvoLogger;
 	import com.junkbyte.console.Cc;
+	import com.sigfa.logger.api.ILogger;
+	import com.sigfa.logger.Logger;
 	import flash.events.NetStatusEvent;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
@@ -19,7 +19,7 @@ package main.service.cirrus
 		static private const ON_RECEIVE_DATA:String = 'onReceiveData';		
 		static private const PUBLISH_STREAM_TYPE:String = 'publishStreamType';		
 		
-		private var logger:IEvoLogger = EvoLogger.getLogger(PeerManager);
+		private var logger:ILogger = Logger.getLogger(PeerManager);
 		private var publicInStreams:Vector.<StreamVo> = new <StreamVo>[];
 		private var publicOutStream:NetStream;
 		private var privateInStreams:Vector.<StreamVo> = new <StreamVo>[];
@@ -40,14 +40,14 @@ package main.service.cirrus
 		 */
 		public function connectToSeed(seedId:String):void
 		{
-			logger.debug('Connecting to seed with ID ' + seedId);
+			logger.log('Connecting to seed with ID ' + seedId);
 			createInStream(StreamType.LISTEN_PUBLIC, seedId);
 		}
 
 		public function createPrivateConnection(peerId:String):void
 		{
 			Cc.log('Creating private connection to ' + peerId);
-			logger.debug('Creating private connection to ' + peerId);
+			logger.log('Creating private connection to ' + peerId);
 			createOutStream(StreamType.PUBLISH_PRIVATE, peerId);
 			sendToSwarm(SwarmCommandType.CREATE_PRIVATE_CONNECTION, [peerId]);
 		}
@@ -93,7 +93,7 @@ package main.service.cirrus
 			newStream.publish(streamName);
 			
 			
-			logger.debug('publishing to ', streamName);
+			logger.log('publishing to ', streamName);
 			return streamName;
 		}
 		
@@ -138,26 +138,26 @@ package main.service.cirrus
 			
 			newStream.play(streamName);
 			
-			logger.debug('listening on ', streamName);
+			logger.log('listening on ', streamName);
 		}
 		
 		
 		private function onOutboundNetStatus(e:NetStatusEvent):void 
 		{
-			logger.debug("onOutboundNetStatus()", e.info.code); 
+			logger.log("onOutboundNetStatus()", e.info.code); 
 		}
 		
 		
 		
 		private function onInboundNetStatus(e:NetStatusEvent):void 
 		{
-			logger.debug("onInboundNetStatus()", e.info.code); 
+			logger.log("onInboundNetStatus()", e.info.code); 
 			
 		}
 		
 		private function onConnectionNetStatus(e:NetStatusEvent):void 
 		{
-			logger.debug("onConnectionNetStatus()", e.info.code); 
+			logger.log("onConnectionNetStatus()", e.info.code); 
 			
 		}
 		
@@ -191,7 +191,7 @@ package main.service.cirrus
 			data.unshift(connection.nearID);
 			data.unshift(commandType);
 			data.unshift(ON_RECEIVE_DATA);			
-			logger.debug('Sending data to swarm: ', String(data));
+			logger.log('Sending data to swarm: ', String(data));
 			publicOutStream.send.apply(null, data);
 		}		
 		
@@ -200,7 +200,7 @@ package main.service.cirrus
 			data.unshift(connection.nearID);
 			data.unshift(SwarmCommandType.PARSE_PRIVATE_DATA);
 			data.unshift(ON_RECEIVE_DATA);			
-			logger.debug('Sending data to private peer: ', String(data));
+			logger.log('Sending data to private peer: ', String(data));
 			getOutStream(peerId).send.apply(null, data);
 		}
 		
@@ -242,14 +242,14 @@ package main.service.cirrus
 			if (!getOutStream(stream.farID))
 			{
 				Cc.log('A third peer ' + stream.farID + ' is listening to a private publish stream!');
-				logger.debug('A third peer ' + stream.farID + ' is listening to a private publish stream!');
+				logger.log('A third peer ' + stream.farID + ' is listening to a private publish stream!');
 				// TODO: drop this connection and somehow create a new unique private connection with
 				// a different name without publishing to this stream so the third party can't listen in.
 				return;
 			}
 			
 			Cc.log("Private peer connected: " + stream.farID);
-			logger.debug("onPrivatePeerConnect(), far id:", stream.farID);
+			logger.log("onPrivatePeerConnect(), far id:", stream.farID);
 			if(!getInStream(StreamType.LISTEN_PRIVATE, stream.farID)) // if you aren't the requester of the connection
 				createInStream(StreamType.LISTEN_PRIVATE, stream.farID);
 		}		
@@ -258,7 +258,7 @@ package main.service.cirrus
 		private function onPublicPeerConnect(stream:NetStream):void 
 		{
 			Cc.log("Public peer connected: " + stream.farID);
-			logger.debug("onPublicPeerConnect(), far id:", stream.farID);
+			logger.log("onPublicPeerConnect(), far id:", stream.farID);
 			
 			if(!getInStream(StreamType.LISTEN_PUBLIC, stream.farID) && !getOutStream(stream.farID))
 				addPeerToSwarm(stream.farID);
@@ -266,7 +266,7 @@ package main.service.cirrus
 		
 		private function addPeerToSwarm(peerId:String):void 
 		{
-			logger.debug('Adding new peer: ' + peerId);
+			logger.log('Adding new peer: ' + peerId);
 			createInStream(StreamType.LISTEN_PUBLIC, peerId);
 			
 			if (publicInStreams.length >= 2) // only tell peers to add new peer if there is a third peer
@@ -282,7 +282,7 @@ package main.service.cirrus
 			var command:String = params.shift();
 			var peerId:String = params.shift();
 			
-			logger.debug('onReceiveData() command=' + command, 'parameters: ', params, 'peer ID: ',peerId );
+			logger.log('onReceiveData() command=' + command, 'parameters: ', params, 'peer ID: ',peerId );
 			
 			switch(command)
 			{
@@ -326,7 +326,7 @@ package main.service.cirrus
 				case SwarmCommandType.PARSE_PRIVATE_DATA:
 					// don't check if inteded for me because private swarms only have two peers
 					Cc.log('Private data received: ' + params);
-					logger.debug('Private data received: ' + params);					
+					logger.log('Private data received: ' + params);					
 					break;
 				
 				default:

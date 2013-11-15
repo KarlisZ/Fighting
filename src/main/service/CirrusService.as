@@ -1,8 +1,8 @@
 package main.service 
 {
-	import com.evolutiongaming.games.core.utils.log.EvoLogger;
-	import com.evolutiongaming.games.core.utils.log.IEvoLogger;
 	import com.junkbyte.console.Cc;
+	import com.sigfa.logger.api.ILogger;
+	import com.sigfa.logger.Logger;
 	import flash.events.NetStatusEvent;
 	import flash.net.GroupSpecifier;
 	import flash.net.NetConnection;
@@ -26,7 +26,7 @@ package main.service
 		private const CIRRUS_DEV_KEY:String = "9bcd901b7ae990234c275219-b39f5f7ebb8c";
 		private const CIRRUS_URL:String = "rtmfp://p2p.rtmfp.net/";
 		
-		private var logger:IEvoLogger = EvoLogger.getLogger(CirrusService);
+		private var logger:ILogger = Logger.getLogger(CirrusService);
 		private var netConnection:NetConnection;
 		private var peerManager:PeerManager;
 		private var seedId:String;
@@ -54,7 +54,7 @@ package main.service
 			//peerManager.debugTf = model.debugTf;
 			
 			
-			logger.debug('onConnectionNetStatus', e.info.code);
+			logger.log('onConnectionNetStatus', e.info.code);
 			switch(e.info.code)
 			{
 				case "NetConnection.Connect.Success":
@@ -96,7 +96,7 @@ package main.service
 		
 		private function print(...rest):void
 		{
-			logger.debug.apply(null, rest);
+			logger.log.apply(null, rest);
 			//model.debugTf.text += "\n" + rest;
 		}
 	}

@@ -1,6 +1,9 @@
 package gui.mediator 
 {
+	import com.sigfa.logger.api.ILogger;
+	import com.sigfa.logger.Logger;
 	import common.event.SubcontextEvent;
+	import gui.event.GuiEvent;
 	import gui.event.MenuEvent;
 	import gui.factory.SubcontextEventFactory;
 	import gui.view.MainMenu;
@@ -12,6 +15,8 @@ package gui.mediator
 	public class MainMenuMediator extends Mediator
 	{
 		[Inject] public var view:MainMenu;
+		
+		private var logger:ILogger = Logger.getLogger(MainMenuMediator);
 		
 		public function MainMenuMediator() 
 		{
@@ -25,7 +30,7 @@ package gui.mediator
 		
 		private function dispatchMenuEvent(e:MenuEvent):void 
 		{
-			dispatch(e);
+			dispatch(new GuiEvent(e.type));
 		}
 		
 	}

@@ -1,4 +1,6 @@
 package combat.context {
+	import com.sigfa.logger.api.ILogger;
+	import com.sigfa.logger.Logger;
 	import combat.command.BuildCombatViewCommand;
 	import combat.command.LoadDataCommand;
 	import combat.command.ManageCombatInputsCommand;
@@ -19,17 +21,23 @@ package combat.context {
 	import combat.view.api.IFighter;
 	import combat.view.CombatView;
 	import combat.view.Fighter;
+	import common.event.SubcontextEvent;
 	import flash.display.DisplayObjectContainer;
+	import flash.events.IEventDispatcher;
 	import org.osflash.signals.Signal;
 	import org.robotlegs.mvcs.SignalContext;
 	/**
 	 * ...
 	 * @author Karlis Zemdega
 	 */
-	public class CombatContext extends SignalContext {
+	public class CombatContext extends SignalContext
+	{
+		private var mainDispatcher:IEventDispatcher;
+		private var logger:ILogger = Logger.getLogger(CombatContext);
 		
-		public function CombatContext(contextView:DisplayObjectContainer)
+		public function CombatContext(contextView:DisplayObjectContainer, mainDispatcher:IEventDispatcher)
 		{
+			this.mainDispatcher = mainDispatcher;
 			super(contextView);
 		}
 		
@@ -46,10 +54,12 @@ package combat.context {
 			injector.mapSingleton(AffectSignal);
 			
 			var initSignal:Signal = new Signal();
-			signalCommandMap.mapSignal(initSignal, LoadDataCommand, true);
+			//signalCommandMap.mapSignal(initSignal, LoadDataCommand, true);
 			signalCommandMap.mapSignalClass(DataLoadedSignal, BuildCombatViewCommand, true);
 			
 			signalCommandMap.mapSignalClass(KeyboardChangeSignal, ManageCombatInputsCommand);
+			
+			commandMap.mapEvent(SubcontextEvent.CREATE_TEST_COMBAT_STAGE, LoadDataCommand);
 			
 			mediatorMap.mapView(CombatView, CombatViewMediator);
 			mediatorMap.mapView(Box2DEngine, EngineMediator, IEngine, false);
@@ -57,8 +67,20 @@ package combat.context {
 			
 			mediatorMap.createMediator(new Box2DEngine());
 			
-			//initSignal.dispatch();
-			//super.startup();
+			listenToMainContext();
+			
+			initSignal.dispatch();
+			super.startup();
+		}
+		
+		private function listenToMainContext():void 
+		{
+			mainDispatcher.addEventListener(SubcontextEvent.CREATE_TEST_COMBAT_STAGE, onSubcontextEvent);
+		}
+		
+		private function onSubcontextEvent(e:SubcontextEvent):void 
+		{
+			dispatchEvent(new SubcontextEvent(e.type, e.data));			
 		}
 		
 	}

@@ -1,7 +1,11 @@
 package gui.command 
 {
+	import com.sigfa.logger.api.ILogger;
+	import com.sigfa.logger.Logger;
 	import common.event.SubcontextEvent;
+	import gui.event.api.IGuiEvent;
 	import gui.event.ConsoleEvent;
+	import gui.event.GuiEvent;
 	import gui.event.MenuEvent;
 	import gui.factory.SubcontextEventFactory;
 	import org.robotlegs.mvcs.Command;
@@ -11,57 +15,53 @@ package gui.command
 	 */
 	public class DispatchSubcontextEventCommand extends Command
 	{
-		[Inject] public var consoleEvent:ConsoleEvent;
-		[Inject] public var menuEvent:ConsoleEvent;
+		[Inject] public var event:GuiEvent;
+		
+		private var logger:ILogger = Logger.getLogger(DispatchSubcontextEventCommand);
 		
 		override public function execute():void
 		{
-			if (consoleEvent)
-				parseConsoleEvent();
-				
-			if	(menuEvent)
-				parseMenuEvent();
+			parseEvent();
 		}
 		
-		private function parseMenuEvent():void 
+		private function parseEvent():void 
 		{
-			switch (menuEvent.type)
+			var e:SubcontextEvent;
+			// main context listens for these
+			switch (event.type)
 			{
 				case MenuEvent.CREATE_TEST_COMBAT_STAGE:
-					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.CREATE_TEST_COMBAT_STAGE));					
-					break;
-			}
-		}
-		
-		private function parseConsoleEvent():void 
-		{
-			// main context listens for these
-			switch (consoleEvent.type)
-			{
+					e = SubcontextEventFactory.produceEvent(SubcontextEvent.CREATE_TEST_COMBAT_STAGE);
+					break;				
+				
 				case ConsoleEvent.CREATE_NETWORK:
-					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.CREATE_NETWORK));
+					e = SubcontextEventFactory.produceEvent(SubcontextEvent.CREATE_NETWORK);
 					break;
 					
 				case ConsoleEvent.CONNECT_TO_PEER:
-					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.CONNECT_TO_PEER, consoleEvent.data));
+					e = SubcontextEventFactory.produceEvent(SubcontextEvent.CONNECT_TO_PEER, event.data);
 					break;
 					
 				case ConsoleEvent.PING_PEER:
-					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.PING_PEER, consoleEvent.data));
+					e = SubcontextEventFactory.produceEvent(SubcontextEvent.PING_PEER, event.data);
 					break;
 					
 				case ConsoleEvent.BROADCAST:
-					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.BROADCAST, consoleEvent.data));
+					e = SubcontextEventFactory.produceEvent(SubcontextEvent.BROADCAST, event.data);
 					break;
 					
 				case ConsoleEvent.REQUEST_PRIVATE_STREAM:
-					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.REQUEST_PRIVATE_STREAM, consoleEvent.data));
+					e = SubcontextEventFactory.produceEvent(SubcontextEvent.REQUEST_PRIVATE_STREAM, event.data);
 					break;
 					
 				case ConsoleEvent.SEND_TO_PRIVATE:
-					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.SEND_TO_PRIVATE, consoleEvent.data));
+					e = SubcontextEventFactory.produceEvent(SubcontextEvent.SEND_TO_PRIVATE, event.data);
 					break;
 			}
+			
+			logger.log("dispatching", e);
+			dispatch(e);
+			
 		}
 		
 	}

@@ -1,5 +1,7 @@
 package main.context
 {
+	import com.sigfa.logger.api.ILogger;
+	import com.sigfa.logger.Logger;
 	import combat.command.BuildCombatViewCommand;
 	import combat.context.CombatContext;
 	import common.event.SubcontextEvent;
@@ -14,13 +16,12 @@ package main.context
 	import main.command.PingPeerCommand;
 	import main.command.SendToPrivateStreamCommand;
 	import main.command.StartupCommand;
-	import org.robotlegs.base.ContextEvent;
+	import org.robotlegs.mvcs.Context;
 	//import main.event.TestEvent;
 	import main.model.MainModel;
 	import main.service.CirrusService;
 	import main.service.events.CirrusServiceEvent;
 	import org.osflash.signals.Signal;
-	import org.robotlegs.mvcs.Context;
 	
 	/**
 	 * ...
@@ -30,6 +31,7 @@ package main.context
 	{
 		private var combatContext:CombatContext;
 		private var guiContext:GuiContext;
+		private var logger:ILogger = Logger.getLogger(MainContext);
 		
 		public function MainContext(contextView:DisplayObjectContainer)
 		{
@@ -37,9 +39,9 @@ package main.context
 		}
 		
 		override public function startup():void
-		{
+		{			
 			guiContext = new GuiContext(contextView);
-			combatContext = new CombatContext(contextView);
+			combatContext = new CombatContext(contextView, eventDispatcher);
 			
 			listenToSubcontexts();
 			
@@ -66,15 +68,14 @@ package main.context
 			guiContext.addEventListener(SubcontextEvent.PING_PEER, onSubcontextEvent);
 			guiContext.addEventListener(SubcontextEvent.REQUEST_PRIVATE_STREAM, onSubcontextEvent);
 			guiContext.addEventListener(SubcontextEvent.SEND_TO_PRIVATE, onSubcontextEvent);
-			
-			// TODO: tell combat context to create view
-			guiContext.addEventListener(SubcontextEvent.CREATE_TEST_COMBAT_STAGE, onSubcontextCommEvent);
+			guiContext.addEventListener(SubcontextEvent.CREATE_TEST_COMBAT_STAGE, onSubcontextEvent);
 		}
 		
 		private function onSubcontextEvent(e:SubcontextEvent):void 
 		{
 			// need to create new event for the system to recognize it for some reason
 			dispatchEvent(new SubcontextEvent(e.type, e.data));
+			logger.log(e);
 		}
 	
 	}

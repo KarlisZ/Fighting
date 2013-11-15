@@ -1,4 +1,6 @@
 package combat.command {
+	import com.sigfa.logger.api.ILogger;
+	import com.sigfa.logger.Logger;
 	import combat.data.AssetType;
 	import combat.model.CombatModel;
 	import combat.signal.DataLoadedSignal;
@@ -20,7 +22,11 @@ package combat.command {
 		
 		[Inject] public var completeSignal:DataLoadedSignal;
 		
-		override public function execute():void {
+		private var logger:ILogger = Logger.getLogger(LoadDataCommand);
+		
+		override public function execute():void
+		{
+			logger.log("Starting combat loader");			
 			if (!model.loader) model.loader = new AssetLoader("CombatLoader");
 			loader = model.loader;
 			
@@ -38,8 +44,9 @@ package combat.command {
 			loader.start();
 		}
 		
-		private function handleLoadError(e:ErrorSignal, loader:ILoader ):void {
-			trace("#LoadDataCommand: " + e.message);
+		private function handleLoadError(e:ErrorSignal, loader:ILoader ):void
+		{
+			logger.error(e.message);
 		}
 		
 		private function handleDataLoaded(signal:LoaderSignal, data:Dictionary):void {

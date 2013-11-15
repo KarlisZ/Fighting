@@ -3,6 +3,7 @@ package gui.mediator
 	import com.junkbyte.console.Cc;
 	import gui.data.ConsoleCommandType;
 	import gui.event.ConsoleEvent;
+	import gui.event.GuiEvent;
 	import gui.vo.ConsoleDataVo;
 	import org.robotlegs.mvcs.Mediator;
 	/**
@@ -38,14 +39,14 @@ package gui.mediator
 			var data:ConsoleDataVo = new ConsoleDataVo();
 			data.nearId = split[0];
 			data.message = split[1];
-			dispatch(new ConsoleEvent(ConsoleEvent.SEND_TO_PRIVATE, data));
+			dispatch(new GuiEvent(ConsoleEvent.SEND_TO_PRIVATE, data));
 		}
 		
 		private function onRequestPrivate(nearId:String):void 
 		{
 			var data:ConsoleDataVo = new ConsoleDataVo();
 			data.nearId = nearId;
-			dispatch(new ConsoleEvent(ConsoleEvent.REQUEST_PRIVATE_STREAM, data));
+			dispatch(new GuiEvent(ConsoleEvent.REQUEST_PRIVATE_STREAM, data));
 		}
 		
 		private function onPing(nearId:String):void 
@@ -59,12 +60,12 @@ package gui.mediator
 		{
 			var data:ConsoleDataVo = new ConsoleDataVo();
 			data.message = message;
-			dispatch(new ConsoleEvent(ConsoleEvent.BROADCAST, data));
+			dispatch(new GuiEvent(ConsoleEvent.BROADCAST, data));
 		}
 		
 		private function onCreateNetwork():void 
 		{
-			dispatch(new ConsoleEvent(ConsoleEvent.CREATE_NETWORK));
+			dispatch(new GuiEvent(ConsoleEvent.CREATE_NETWORK));
 			
 		}
 		
@@ -72,7 +73,7 @@ package gui.mediator
 		{
 			var data:ConsoleDataVo = new ConsoleDataVo();
 			data.nearId = nearId;
-			dispatch(new ConsoleEvent(ConsoleEvent.CONNECT_TO_PEER, data));
+			dispatch(new GuiEvent(ConsoleEvent.CONNECT_TO_PEER, data));
 		}
 		
 	}

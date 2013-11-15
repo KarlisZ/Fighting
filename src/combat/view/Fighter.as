@@ -1,4 +1,6 @@
 package combat.view {
+	import com.sigfa.logger.api.ILogger;
+	import com.sigfa.logger.Logger;
 	import combat.constant.ActionType;
 	import combat.constant.CollidingObjectType;
 	import combat.data.AffectType;
@@ -29,7 +31,11 @@ package combat.view {
 		private var delayedAffects:Vector.<uint> = new <uint>[];
 		private var initBounds:Rectangle;
 		
-		public function Fighter(player:Player) {
+		private var logger:ILogger;
+		
+		public function Fighter(player:Player)
+		{
+			logger = Logger.getLogger("Fighter:" + player.type);
 			_player = player;
 			init();
 		}
@@ -109,7 +115,7 @@ package combat.view {
 					break;
 					
 				default:
-					trace("[FIGHTER] WARNING: stopAction() encountered unexpected action type " + type + " with id " + id);
+					logger.warn("stopAction() encountered unexpected action type " + type + " with id " + id);
 					return;
 			}
 		}

@@ -1,8 +1,8 @@
 package gui.view 
 {
 	import com.bit101.components.PushButton;
-	import com.evolutiongaming.games.core.utils.log.EvoLogger;
-	import com.evolutiongaming.games.core.utils.log.IEvoLogger;
+	import com.sigfa.logger.api.ILogger;
+	import com.sigfa.logger.Logger;
 	import flash.display.Graphics;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -19,7 +19,7 @@ package gui.view
 	{
 		static public const TITLE_TEXT:String = "Peer Pressure";
 		
-		private const logger:IEvoLogger = EvoLogger.getLogger(MainMenu);
+		private const logger:ILogger = Logger.getLogger(MainMenu);
 		private var menuButtons:Vector.<PushButton>;
 		private var title:TextField;
 		
@@ -166,7 +166,9 @@ package gui.view
 		
 		private function onTestStageClick(e:MouseEvent):void 
 		{
+			logger.log("Test stage clicked");
 			dispatchEvent(new MenuEvent(MenuEvent.CREATE_TEST_COMBAT_STAGE));
+			visible = false;
 		}
 		
 		private function createMenuButton(label:String):PushButton 
