@@ -27,8 +27,8 @@ package gui.context
 			mediatorMap.mapView(MainMenu, MainMenuMediator);
 			
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, BootstrapGuiCommand, Event, true);
-			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, BuildGuiCommand, Event, true);
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, MapViewsCommand, Event, true);
+			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, BuildGuiCommand, Event, true);
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, BuildConsoleCommand, Event, true);
 			
 			super.startup();

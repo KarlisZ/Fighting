@@ -18,17 +18,13 @@ package gui.mediator
 		
 		private var logger:ILogger = Logger.getLogger(MainMenuMediator);
 		
-		public function MainMenuMediator() 
-		{
-			
-		}
-		
 		override public function onRegister():void
 		{
-			view.addEventListener(MenuEvent.CREATE_TEST_COMBAT_STAGE, dispatchMenuEvent);
+			view.addEventListener(MenuEvent.CREATE_TEST_COMBAT_STAGE, dispatchGuiEvent);
+			view.addEventListener(MenuEvent.JOIN_LOBBY, dispatchGuiEvent);
 		}
 		
-		private function dispatchMenuEvent(e:MenuEvent):void 
+		private function dispatchGuiEvent(e:MenuEvent):void 
 		{
 			dispatch(new GuiEvent(e.type));
 		}

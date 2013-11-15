@@ -142,7 +142,8 @@ package gui.view
 		
 		private function onJoinLobbyClick(e:MouseEvent):void 
 		{
-			
+			logger.log("Join lobby clicked");
+			dispatchEvent(new MenuEvent(MenuEvent.JOIN_LOBBY));
 		}
 		
 		private function createQuickMatchButton():PushButton 

@@ -3,7 +3,9 @@ package gui.command
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.Console;
 	import gui.mediator.ConsoleMediator;
+	import gui.mediator.LobbyContainerMediator;
 	import gui.mediator.TestUiMediator;
+	import gui.view.LobbyContainer;
 	import gui.view.TestUi;
 	import org.robotlegs.mvcs.Command;
 	/**
@@ -17,6 +19,7 @@ package gui.command
 		{
 			//mediatorMap.mapView(TestUi, TestUiMediator);
 			mediatorMap.mapView(Console, ConsoleMediator);
+			mediatorMap.mapView(LobbyContainer, LobbyContainerMediator);
 			
 		}
 		
