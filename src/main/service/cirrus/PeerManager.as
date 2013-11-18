@@ -300,6 +300,7 @@ package main.service.cirrus
 					
 				case SwarmCommandType.CREATE_PRIVATE_CONNECTION:
 					var privateReqId:String = params.shift(); // the ID of the peer that the sender wants to connect to.
+					// TODO: prompt here if user wants to connect
 					if (connection.nearID === privateReqId)
 					{
 						Cc.log('Request for private connection received, setting up listening stream...');

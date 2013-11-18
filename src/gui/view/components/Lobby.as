@@ -21,6 +21,7 @@ package gui.view.components
 		
 		public function Lobby(parent:DisplayObjectContainer, title:String) 
 		{
+			// TODO: click on member switches to private chat
 			super(parent, 0, 0, title);
 			build();
 		}

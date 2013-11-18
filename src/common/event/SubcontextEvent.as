@@ -19,6 +19,7 @@ package common.event
 		static public const PUBLIC_PEER_CONNECTED:String = "SubcontextEvent.PUBLIC_PEER_CONNECTED";
 		static public const PRIVATE_PEER_CONNECTED:String = "SubcontextEvent.PRIVATE_PEER_CONNECTED";
 		static public const BROADCAST_RECEIVED:String = "SubcontextEvent.BROADCAST_RECEIVED";
+		static public const CHALLENGER_SELECTED:String = "SubcontextEvent.CHALLENGER_SELECTED";
 		
 		public var data:SubcontextDataVo;
 		

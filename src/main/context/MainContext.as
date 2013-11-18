@@ -57,6 +57,9 @@ package main.context
 			commandMap.mapEvent(SubcontextEvent.REQUEST_PRIVATE_STREAM, CreatePrivateStream, SubcontextEvent);
 			commandMap.mapEvent(SubcontextEvent.SEND_TO_PRIVATE, SendToPrivateStreamCommand, SubcontextEvent);
 			
+			// TODO: prompt other user to accept private stream
+			commandMap.mapEvent(SubcontextEvent.CHALLENGER_SELECTED, CreatePrivateStream, SubcontextEvent);
+			
 			super.startup();
 		}
 		
@@ -69,6 +72,7 @@ package main.context
 			guiContext.addEventListener(SubcontextEvent.REQUEST_PRIVATE_STREAM, onSubcontextEvent);
 			guiContext.addEventListener(SubcontextEvent.SEND_TO_PRIVATE, onSubcontextEvent);
 			guiContext.addEventListener(SubcontextEvent.CREATE_TEST_COMBAT_STAGE, onSubcontextEvent);
+			guiContext.addEventListener(SubcontextEvent.CHALLENGER_SELECTED, onSubcontextEvent);
 		}
 		
 		private function onSubcontextEvent(e:SubcontextEvent):void 

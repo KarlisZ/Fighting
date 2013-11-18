@@ -65,6 +65,11 @@ package common.factory
 					ret = new SubcontextEvent(SubcontextEvent.BROADCAST_RECEIVED, dataVo);
 					break;
 				
+				case SubcontextEvent.CHALLENGER_SELECTED:
+					dataVo.nearId = data;
+					ret = new SubcontextEvent(SubcontextEvent.CHALLENGER_SELECTED, dataVo);
+					break;
+				
 				default:
 					throw new Error('Unexpected event type "' + type + '" received.');
 			}

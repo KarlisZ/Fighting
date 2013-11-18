@@ -9,6 +9,7 @@ package gui.mediator
 	import gui.model.event.ModelUpdatedEvent;
 	import gui.model.GuiModel;
 	import gui.view.components.event.LobbyEvent;
+	import gui.view.components.event.MembersPaneEvent;
 	import gui.view.event.LobbyContainerEvent;
 	import gui.view.LobbyContainer;
 	import org.robotlegs.mvcs.Mediator;
@@ -32,6 +33,12 @@ package gui.mediator
 			
 			addViewListener(LobbyContainerEvent.JOIN_LOBBY, onJoinLobby);
 			addViewListener(LobbyEvent.MESSAGE_ENTERED, onMessageEntered);
+			addViewListener(MembersPaneEvent.CHALLENGE_CLICKED, onChallengeClicked);
+		}
+		
+		private function onChallengeClicked(e:MembersPaneEvent):void 
+		{
+			dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.CHALLENGER_SELECTED, e.data));
 		}
 		
 		private function onBroadcastReceived(e:SubcontextEvent):void 
