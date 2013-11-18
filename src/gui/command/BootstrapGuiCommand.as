@@ -1,5 +1,6 @@
 package gui.command 
 {
+	import common.event.SubcontextEvent;
 	import gui.event.api.IGuiEvent;
 	import gui.event.ConsoleEvent;
 	import gui.event.MenuEvent;
@@ -25,6 +26,9 @@ package gui.command
 			commandMap.mapEvent(ConsoleEvent.SEND_TO_PRIVATE, DispatchSubcontextEventCommand, IGuiEvent);
 			
 			commandMap.mapEvent(MenuEvent.CREATE_TEST_COMBAT_STAGE, DispatchSubcontextEventCommand, IGuiEvent);
+			
+			// subcontexts
+			commandMap.mapEvent(SubcontextEvent.NEAR_ID_KNOWN, HandleSubcontextEvent, SubcontextEvent);
 		}
 		
 	}

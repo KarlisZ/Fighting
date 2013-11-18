@@ -15,6 +15,10 @@ package common.event
 		static public const REQUEST_PRIVATE_STREAM:String = "SubcontextEvent.REQUEST_PRIVATE_STREAM";
 		static public const SEND_TO_PRIVATE:String = "SubcontextEvent.SEND_TO_PRIVATE";
 		static public const CREATE_TEST_COMBAT_STAGE:String = "SubcontextEvent.CREATE_TEST_COMBAT_STAGE";
+		static public const NEAR_ID_KNOWN:String = "SubcontextEvent.NEAR_ID_KNOWN";
+		static public const PUBLIC_PEER_CONNECTED:String = "SubcontextEvent.PUBLIC_PEER_CONNECTED";
+		static public const PRIVATE_PEER_CONNECTED:String = "SubcontextEvent.PRIVATE_PEER_CONNECTED";
+		static public const BROADCAST_RECEIVED:String = "SubcontextEvent.BROADCAST_RECEIVED";
 		
 		public var data:SubcontextDataVo;
 		

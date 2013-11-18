@@ -135,7 +135,7 @@ package gui.view
 		
 		private function createJoinLobbyButton():PushButton 
 		{
-			const button:PushButton = createMenuButton('Join A Lobby');
+			const button:PushButton = createMenuButton('Join/Create A Lobby');
 			button.addEventListener(MouseEvent.CLICK, onJoinLobbyClick);
 			return button;
 		}

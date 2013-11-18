@@ -7,7 +7,8 @@ package main.service.events
 	 */
 	public class CirrusServiceEvent extends Event
 	{
-		public static const CONNECTED:String = 'CirrusServiceEvent.CONNECTED';
+		public static const CONNECTED_TO_PEER:String = 'CirrusServiceEvent.CONNECTED_TO_PEER';
+		static public const CONNECTED_TO_CIRRUS:String = "CirrusServiceEvent.CONNECTED_TO_CIRRUS";
 		
 		public function CirrusServiceEvent(type:String) 
 		{

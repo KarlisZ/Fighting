@@ -16,6 +16,7 @@ package main.context
 	import main.command.PingPeerCommand;
 	import main.command.SendToPrivateStreamCommand;
 	import main.command.StartupCommand;
+	import org.robotlegs.base.ContextEvent;
 	import org.robotlegs.mvcs.Context;
 	//import main.event.TestEvent;
 	import main.model.MainModel;
@@ -40,7 +41,7 @@ package main.context
 		
 		override public function startup():void
 		{			
-			guiContext = new GuiContext(contextView);
+			guiContext = new GuiContext(contextView, eventDispatcher);
 			combatContext = new CombatContext(contextView, eventDispatcher);
 			
 			listenToSubcontexts();
@@ -48,10 +49,9 @@ package main.context
 			injector.mapSingleton(MainModel);
 			injector.mapSingleton(CirrusService);
 			
-			//commandMap.mapEvent(CirrusServiceEvent.CONNECTED, SendGreetingCommand, CirrusServiceEvent, true);
-			//commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, StartupCommand, Event, true);
+			//commandMap.mapEvent(SubcontextEvent.CREATE_NETWORK, CreateNetworkCommand, SubcontextEvent);
+			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, CreateNetworkCommand, Event, true);
 			commandMap.mapEvent(SubcontextEvent.CONNECT_TO_PEER, ConnectToPeerCommand, SubcontextEvent);
-			commandMap.mapEvent(SubcontextEvent.CREATE_NETWORK, CreateNetworkCommand, SubcontextEvent);
 			commandMap.mapEvent(SubcontextEvent.BROADCAST, BroadcastCommand, SubcontextEvent);
 			commandMap.mapEvent(SubcontextEvent.PING_PEER, PingPeerCommand, SubcontextEvent);
 			commandMap.mapEvent(SubcontextEvent.REQUEST_PRIVATE_STREAM, CreatePrivateStream, SubcontextEvent);

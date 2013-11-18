@@ -3,6 +3,7 @@ package main.service.cirrus
 	import com.junkbyte.console.Cc;
 	import com.sigfa.logger.api.ILogger;
 	import com.sigfa.logger.Logger;
+	import flash.events.EventDispatcher;
 	import flash.events.NetStatusEvent;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
@@ -10,11 +11,12 @@ package main.service.cirrus
 	import flash.utils.getTimer;
 	import main.service.cirrus.data.StreamType;
 	import main.service.cirrus.data.SwarmCommandType;
+	import main.service.cirrus.events.PeerManagerEvent;
 	/**
 	 * ...
 	 * @author Karlis Zemdega
 	 */
-	public class PeerManager 
+	public class PeerManager extends EventDispatcher
 	{
 		static private const ON_RECEIVE_DATA:String = 'onReceiveData';		
 		static private const PUBLISH_STREAM_TYPE:String = 'publishStreamType';		
@@ -31,7 +33,7 @@ package main.service.cirrus
 		
 		public function PeerManager() 
 		{
-			
+			super(this);
 		}
 		
 		/**
@@ -260,8 +262,11 @@ package main.service.cirrus
 			Cc.log("Public peer connected: " + stream.farID);
 			logger.log("onPublicPeerConnect(), far id:", stream.farID);
 			
+			// if don't have out stream to peer
 			if(!getInStream(StreamType.LISTEN_PUBLIC, stream.farID) && !getOutStream(stream.farID))
 				addPeerToSwarm(stream.farID);
+				
+			dispatchEvent(new PeerManagerEvent(PeerManagerEvent.PUBLIC_PEER_CONNECTED, stream.farID));
 		}		
 		
 		private function addPeerToSwarm(peerId:String):void 
@@ -289,6 +294,7 @@ package main.service.cirrus
 				case SwarmCommandType.PARSE_BROADCAST:
 					
 					Cc.log('Received broadcast data: ' + params.toString());
+					dispatchEvent(new PeerManagerEvent(PeerManagerEvent.BROADCAST_RECEIVED, {peerId:peerId, message:params.toString()}));
 					//broadcast(params, peerId);
 					break;
 					

@@ -3,13 +3,15 @@ package main.service
 	import com.junkbyte.console.Cc;
 	import com.sigfa.logger.api.ILogger;
 	import com.sigfa.logger.Logger;
+	import common.event.SubcontextEvent;
 	import flash.events.NetStatusEvent;
 	import flash.net.GroupSpecifier;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
 	import flash.system.System;
 	import flash.utils.setTimeout;
-	import main.model.MainModel;
+	import common.factory.SubcontextEventFactory;
+	import main.service.cirrus.events.PeerManagerEvent;
 	import main.service.cirrus.PeerManager;
 	import main.service.events.CirrusServiceEvent;
 	import org.robotlegs.mvcs.Actor;
@@ -19,7 +21,6 @@ package main.service
 	 */
 	public class CirrusService extends Actor
 	{
-		[Inject] public var model:MainModel; // TODO: remove this ofc
 		
 		// cirrus dev key 9bcd901b7ae990234c275219-b39f5f7ebb8c
 		// connection token rtmfp://p2p.rtmfp.net/9bcd901b7ae990234c275219-b39f5f7ebb8c/
@@ -35,12 +36,34 @@ package main.service
 		{
 			peerManager = new PeerManager();
 			netConnection = new NetConnection();
+			
+			listenToPeerManager();
+		}
+		
+		private function listenToPeerManager():void 
+		{
+			peerManager.addEventListener(PeerManagerEvent.PUBLIC_PEER_CONNECTED, onPeerManagerEvent);
+			peerManager.addEventListener(PeerManagerEvent.BROADCAST_RECEIVED, onPeerManagerEvent);
+		}
+		
+		private function onPeerManagerEvent(e:PeerManagerEvent):void 
+		{
+			switch(e.type)
+			{
+				case PeerManagerEvent.PUBLIC_PEER_CONNECTED:
+					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.PUBLIC_PEER_CONNECTED, e.data));
+					break;
+					
+				case PeerManagerEvent.BROADCAST_RECEIVED:
+					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.BROADCAST_RECEIVED, e.data));
+					
+				default:;
+			}
 		}
 		
 		public function connectToNetwork(peerId:String):void 
 		{
-			seedId = peerId;
-			connectToCirrus();
+			peerManager.connectToSeed(peerId);
 		}
 		
 		private function connectToCirrus():void 
@@ -51,9 +74,6 @@ package main.service
 		
 		private function onConnectionNetStatus(e:NetStatusEvent):void 
 		{
-			//peerManager.debugTf = model.debugTf;
-			
-			
 			logger.log('onConnectionNetStatus', e.info.code);
 			switch(e.info.code)
 			{
@@ -62,8 +82,8 @@ package main.service
 					peerManager.connection = netConnection;
 					peerManager.publishToPublic();
 					
-					if (seedId)
-						peerManager.connectToSeed(seedId);
+					dispatch(new CirrusServiceEvent(CirrusServiceEvent.CONNECTED_TO_CIRRUS));
+					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.NEAR_ID_KNOWN, netConnection.nearID));
 					break;
 			}
 		}
@@ -75,7 +95,7 @@ package main.service
 		
 		public function broadcast(data:*):void 
 		{
-			print("sending", data);
+			logger.log("sending", data);
 			peerManager.broadcast([data]);
 		}
 		
@@ -92,12 +112,6 @@ package main.service
 		public function sendToPrivateSwarm(nearId:String, message:String):void 
 		{
 			peerManager.sendToPeer(nearId, [message]);
-		}
-		
-		private function print(...rest):void
-		{
-			logger.log.apply(null, rest);
-			//model.debugTf.text += "\n" + rest;
 		}
 	}
 

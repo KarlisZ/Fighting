@@ -5,7 +5,7 @@ package gui.mediator
 	import common.event.SubcontextEvent;
 	import gui.event.GuiEvent;
 	import gui.event.MenuEvent;
-	import gui.factory.SubcontextEventFactory;
+	import common.factory.SubcontextEventFactory;
 	import gui.view.MainMenu;
 	import org.robotlegs.mvcs.Mediator;
 	/**

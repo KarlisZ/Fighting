@@ -7,7 +7,7 @@ package gui.command
 	import gui.event.ConsoleEvent;
 	import gui.event.GuiEvent;
 	import gui.event.MenuEvent;
-	import gui.factory.SubcontextEventFactory;
+	import common.factory.SubcontextEventFactory;
 	import org.robotlegs.mvcs.Command;
 	/**
 	 * ...

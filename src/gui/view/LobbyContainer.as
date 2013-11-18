@@ -8,13 +8,16 @@ package gui.view
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	import gui.view.components.Lobby;
+	import gui.view.event.LobbyContainerEvent;
 	/**
 	 * ...
 	 * @author Karlis Zemdega
 	 */
 	public class LobbyContainer extends Sprite
 	{
+		public var nearId:String;
 		private var logger:ILogger = Logger.getLogger(LobbyContainer);
+		private var lobby:Lobby;
 		
 		public function LobbyContainer() 
 		{
@@ -32,13 +35,34 @@ package gui.view
 			const input:InputText = new InputText(idPrompt);
 			
 			idPrompt.width =
-			input.width = 300;
+			input.width = 500;
 			
 			idPrompt.height = idPrompt.titleBar.height + input.height;
+			
+			input.text = nearId;
+			input.draw();
+			input.textField.setSelection(0, nearId.length);
+			//System.setClipboard(nearId);
 			
 			stage.focus = input.textField;
 			
 			input.addEventListener(KeyboardEvent.KEY_DOWN, onJoinIdEntered);
+		}
+		
+		public function addPublicPeer(farId:String):void 
+		{
+			lobby.addMember(farId);
+			lobby.addChatMessage("[SYSTEM] Peer joined the lobby: " + farId);
+		}
+		
+		public function addPrivatePeer(farId:String):void 
+		{
+			
+		}
+		
+		public function addPublicMessage(peerId:String, message:String):void 
+		{
+			lobby.addChatMessage("[" + peerId.substr(0, 4) + "]: " + message);
 		}
 		
 		private function onJoinIdEntered(e:KeyboardEvent):void 
@@ -48,7 +72,16 @@ package gui.view
 			
 			if (e.keyCode === Keyboard.ENTER)
 			{
-				openLobby(input.text);
+				
+				if (input.text !== nearId)
+				{					
+					openLobby(input.text);
+					dispatchEvent(new LobbyContainerEvent(LobbyContainerEvent.JOIN_LOBBY, input.text));
+				}
+				else
+				{
+					openLobby("My Lobby");
+				}
 				
 				input.removeEventListener(KeyboardEvent.KEY_DOWN, onJoinIdEntered);
 				removeChild(window);
@@ -57,11 +90,14 @@ package gui.view
 		
 		private function openLobby(id:String):void 
 		{
-			const lobby:Lobby = new Lobby(this, "Lobby ID: " + id);
+			lobby = new Lobby(this, "Lobby ID: " + id);
 			
 			lobby.x = 150;
 			lobby.y = 150;
+			
+			lobby.addChatMessage("[SYSTEM] Waiting for connections...");
 		}
+		
 		
 	}
 

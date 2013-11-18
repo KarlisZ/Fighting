@@ -4,7 +4,10 @@ package gui.view.components
 	import com.bit101.components.TextArea;
 	import com.bit101.components.Window;
 	import flash.display.DisplayObjectContainer;
+	import flash.events.KeyboardEvent;
 	import flash.geom.Rectangle;
+	import flash.ui.Keyboard;
+	import gui.view.components.event.LobbyEvent;
 	/**
 	 * ...
 	 * @author Karlis Zemdega
@@ -29,6 +32,23 @@ package gui.view.components
 			addChild(members);
 			
 			setSize(DEFAULT_SIZE.width, DEFAULT_SIZE.height);
+			
+			listenToInput();
+		}
+		
+		private function listenToInput():void 
+		{
+			input.addEventListener(KeyboardEvent.KEY_UP, onInputKeyUp);
+		}
+		
+		private function onInputKeyUp(e:KeyboardEvent):void 
+		{
+			if (e.keyCode === Keyboard.ENTER && !e.shiftKey)
+			{
+				addChatMessage("[ME]: " + input.text);
+				dispatchEvent(new LobbyEvent(LobbyEvent.MESSAGE_ENTERED, input.text));
+				input.text = "";
+			}
 		}
 		
 		override public function setSize(w:Number, h:Number):void
@@ -36,6 +56,16 @@ package gui.view.components
 			super.setSize(w, h);
 			draw();
 			validate();
+		}
+		
+		public function addChatMessage(message:String):void 
+		{
+			chat.text += message + "\n";
+		}
+		
+		public function addMember(farId:String):void 
+		{
+			members.addMember(farId);
 		}
 		
 		private function validate():void 
