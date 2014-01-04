@@ -20,6 +20,8 @@ package common.event
 		static public const PRIVATE_PEER_CONNECTED:String = "SubcontextEvent.PRIVATE_PEER_CONNECTED";
 		static public const BROADCAST_RECEIVED:String = "SubcontextEvent.BROADCAST_RECEIVED";
 		static public const CHALLENGER_SELECTED:String = "SubcontextEvent.CHALLENGER_SELECTED";
+		static public const REQUEST_PRIVATE_STREAM_RECEIVED:String = "SubcontextEvent.REQUEST_PRIVATE_STREAM_RECEIVED";
+		static public const PRIVATE_STREAM_ACCEPTED:String = "SubcontextEvent.PRIVATE_STREAM_ACCEPTED";
 		
 		public var data:SubcontextDataVo;
 		

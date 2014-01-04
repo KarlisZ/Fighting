@@ -3,6 +3,7 @@ package gui.command
 	import gui.model.GuiModel;
 	import gui.view.LobbyContainer;
 	import gui.view.MainMenu;
+	import gui.view.PopupContainer;
 	import org.robotlegs.mvcs.Command;
 	/**
 	 * ...
@@ -19,8 +20,11 @@ package gui.command
 			
 			const lobby:LobbyContainer = new LobbyContainer();
 			
+			const popups:PopupContainer = new PopupContainer();
+			
 			contextView.addChild(lobby);
 			contextView.addChild(mainMenu);
+			contextView.addChild(popups);
 		}
 		
 	}

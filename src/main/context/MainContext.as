@@ -9,11 +9,13 @@ package main.context
 	import flash.events.Event;
 	import flash.events.IEventDispatcher;
 	import gui.context.GuiContext;
+	import main.command.AcceptPrivateStreamCommand;
 	import main.command.BroadcastCommand;
 	import main.command.ConnectToPeerCommand;
 	import main.command.CreateNetworkCommand;
 	import main.command.CreatePrivateStream;
 	import main.command.PingPeerCommand;
+	import main.command.SendChallengeCommand;
 	import main.command.SendToPrivateStreamCommand;
 	import main.command.StartupCommand;
 	import org.robotlegs.base.ContextEvent;
@@ -57,8 +59,8 @@ package main.context
 			commandMap.mapEvent(SubcontextEvent.REQUEST_PRIVATE_STREAM, CreatePrivateStream, SubcontextEvent);
 			commandMap.mapEvent(SubcontextEvent.SEND_TO_PRIVATE, SendToPrivateStreamCommand, SubcontextEvent);
 			
-			// TODO: prompt other user to accept private stream
-			commandMap.mapEvent(SubcontextEvent.CHALLENGER_SELECTED, CreatePrivateStream, SubcontextEvent);
+			commandMap.mapEvent(SubcontextEvent.CHALLENGER_SELECTED, SendChallengeCommand, SubcontextEvent);
+			commandMap.mapEvent(SubcontextEvent.PRIVATE_STREAM_ACCEPTED, AcceptPrivateStreamCommand, SubcontextEvent);
 			
 			super.startup();
 		}
@@ -73,6 +75,7 @@ package main.context
 			guiContext.addEventListener(SubcontextEvent.SEND_TO_PRIVATE, onSubcontextEvent);
 			guiContext.addEventListener(SubcontextEvent.CREATE_TEST_COMBAT_STAGE, onSubcontextEvent);
 			guiContext.addEventListener(SubcontextEvent.CHALLENGER_SELECTED, onSubcontextEvent);
+			guiContext.addEventListener(SubcontextEvent.PRIVATE_STREAM_ACCEPTED, onSubcontextEvent);
 		}
 		
 		private function onSubcontextEvent(e:SubcontextEvent):void 

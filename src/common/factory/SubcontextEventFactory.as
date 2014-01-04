@@ -70,6 +70,16 @@ package common.factory
 					ret = new SubcontextEvent(SubcontextEvent.CHALLENGER_SELECTED, dataVo);
 					break;
 				
+				case SubcontextEvent.PRIVATE_STREAM_ACCEPTED:
+					dataVo.nearId = data;
+					ret = new SubcontextEvent(SubcontextEvent.PRIVATE_STREAM_ACCEPTED, dataVo);
+					break;
+				
+				case SubcontextEvent.REQUEST_PRIVATE_STREAM_RECEIVED:
+					dataVo.nearId = data;
+					ret = new SubcontextEvent(SubcontextEvent.PRIVATE_STREAM_ACCEPTED, dataVo);
+					break;
+				
 				default:
 					throw new Error('Unexpected event type "' + type + '" received.');
 			}

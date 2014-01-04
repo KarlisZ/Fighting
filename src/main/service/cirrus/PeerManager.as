@@ -178,6 +178,11 @@ package main.service.cirrus
 			createOutStream(StreamType.PUBLISH_PUBLIC);
 		}
 		
+		public function hasConnection(peerId:String):Boolean
+		{
+			return Boolean(getInStream(peerId));
+		}
+		
 		private function replyPing(time:String):void 
 		{
 			sendToSwarm(SwarmCommandType.PARSE_PING_REPLY, [time]);
@@ -254,6 +259,8 @@ package main.service.cirrus
 			logger.log("onPrivatePeerConnect(), far id:", stream.farID);
 			if(!getInStream(StreamType.LISTEN_PRIVATE, stream.farID)) // if you aren't the requester of the connection
 				createInStream(StreamType.LISTEN_PRIVATE, stream.farID);
+			else
+				dispatchEvent(new PeerManagerEvent(PeerManagerEvent.PRIVATE_CONNECTION_ESTABLISHED, stream.farID)); // should mean other peer accepted the connection
 		}		
 		
 		
@@ -281,6 +288,12 @@ package main.service.cirrus
 			}
 		}
 		
+		public function aceptPrivateConnection(peerId:String):void
+		{
+			createOutStream(StreamType.PUBLISH_PRIVATE, peerId);
+			createInStream(StreamType.LISTEN_PRIVATE, peerId);
+		}
+		
 		private function onReceiveData(...params):void
 		{
 			//var castHash:String = params.shift();
@@ -303,9 +316,8 @@ package main.service.cirrus
 					// TODO: prompt here if user wants to connect
 					if (connection.nearID === privateReqId)
 					{
-						Cc.log('Request for private connection received, setting up listening stream...');
-						createOutStream(StreamType.PUBLISH_PRIVATE, peerId);
-						createInStream(StreamType.LISTEN_PRIVATE, peerId);
+						Cc.log('Request for private connection received from ' + peerId);
+						dispatchEvent(new PeerManagerEvent(PeerManagerEvent.REQUEST_PRIVATE_STREAM_RECIEVED, peerId));
 					}
 					else
 						Cc.log('Request for private connection received, but not for me.');
@@ -333,8 +345,10 @@ package main.service.cirrus
 				case SwarmCommandType.PARSE_PRIVATE_DATA:
 					// don't check if inteded for me because private swarms only have two peers
 					Cc.log('Private data received: ' + params);
-					logger.log('Private data received: ' + params);					
-					break;
+					logger.log('Private data received: ' + params);
+					
+					dispatchEvent(new PeerManagerEvent(PeerManagerEvent.PRIVATE_DATA_RECEIVED, params));
+					break;				
 				
 				default:
 					throw new Error('Unexpected command type received: ' + command);

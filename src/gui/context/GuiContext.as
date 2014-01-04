@@ -48,6 +48,7 @@ package gui.context
 			mainDispatcher.addEventListener(SubcontextEvent.NEAR_ID_KNOWN, onSubcontextEvent);
 			mainDispatcher.addEventListener(SubcontextEvent.PUBLIC_PEER_CONNECTED, onSubcontextEvent);
 			mainDispatcher.addEventListener(SubcontextEvent.BROADCAST_RECEIVED, onSubcontextEvent);
+			mainDispatcher.addEventListener(SubcontextEvent.REQUEST_PRIVATE_STREAM_RECEIVED, onSubcontextEvent);
 		}
 		
 		private function onSubcontextEvent(e:SubcontextEvent):void 

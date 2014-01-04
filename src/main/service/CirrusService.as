@@ -9,8 +9,10 @@ package main.service
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
 	import flash.system.System;
+	import flash.utils.Dictionary;
 	import flash.utils.setTimeout;
 	import common.factory.SubcontextEventFactory;
+	import main.service.cirrus.data.PrivateCommandType;
 	import main.service.cirrus.events.PeerManagerEvent;
 	import main.service.cirrus.PeerManager;
 	import main.service.events.CirrusServiceEvent;
@@ -31,6 +33,7 @@ package main.service
 		private var netConnection:NetConnection;
 		private var peerManager:PeerManager;
 		private var seedId:String;
+		private var messageQueue:Dictionary = new Dictionary();
 		
 		public function CirrusService() 
 		{
@@ -44,6 +47,8 @@ package main.service
 		{
 			peerManager.addEventListener(PeerManagerEvent.PUBLIC_PEER_CONNECTED, onPeerManagerEvent);
 			peerManager.addEventListener(PeerManagerEvent.BROADCAST_RECEIVED, onPeerManagerEvent);
+			peerManager.addEventListener(PeerManagerEvent.REQUEST_PRIVATE_STREAM_RECIEVED, onPeerManagerEvent);
+			peerManager.addEventListener(PeerManagerEvent.PRIVATE_CONNECTION_ESTABLISHED, onPeerManagerEvent);
 		}
 		
 		private function onPeerManagerEvent(e:PeerManagerEvent):void 
@@ -56,9 +61,47 @@ package main.service
 					
 				case PeerManagerEvent.BROADCAST_RECEIVED:
 					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.BROADCAST_RECEIVED, e.data));
+					break;
+					
+				case PeerManagerEvent.REQUEST_PRIVATE_STREAM_RECIEVED:
+					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.REQUEST_PRIVATE_STREAM_RECEIVED, e.data));
+					break;
+					
+				case PeerManagerEvent.PRIVATE_CONNECTION_ESTABLISHED:
+					sendMessageQueue(e.data);
+					break;
+					
+				case PeerManagerEvent.PRIVATE_DATA_RECEIVED:
+					parsePrivateData(e.data);
+					break;
 					
 				default:;
 			}
+		}
+		
+		private function parsePrivateData(data:*):void 
+		{
+			switch (data)
+			{
+				case PrivateCommandType.REQUEST_COMBAT:
+					// TODO: create combat stage and WOMBAT!
+					dispatch(SubcontextEventFactory.produceEvent(SubcontextEvent.
+					break;
+					
+				default:
+					throw new ArgumentError("unexpected private data received: " + data);
+			}
+		}
+		
+		private function sendMessageQueue(peerId:String):void 
+		{
+			const queue:Vector.<String> = messageQueue[peerId] as Vector.<String>;
+			if (!queue) return;
+			
+			for each (var message:String in queue)
+				peerManager.sendToPeer(peerId, message);
+				
+			if (!queue.length) messageQueue[peerId] = null;
 		}
 		
 		public function connectToNetwork(peerId:String):void 
@@ -112,6 +155,30 @@ package main.service
 		public function sendToPrivateSwarm(nearId:String, message:String):void 
 		{
 			peerManager.sendToPeer(nearId, [message]);
+		}
+		
+		public function acceptPrivateConnection(peerId:String):void
+		{
+			peerManager.aceptPrivateConnection(peerId)
+		}
+		
+		/**
+		 * checks if connection exists, creates it if not and queues the message.
+		 * @param	nearId
+		 */
+		public function smartSend(nearId:String, message:String):void 
+		{
+			if (peerManager.hasConnection(nearId))
+				peerManager.sendToPeer(nearId, [message]);
+			else
+			{
+				peerManager.createPrivateConnection(nearId);
+				
+				messageQueue[nearId] ||= new Vector.<String>();
+				const queue:Vector.<String> = messageQueue[nearId] as Vector.<String>;
+				messageQueue[nearId].push(message);
+			}
+			
 		}
 	}
 
